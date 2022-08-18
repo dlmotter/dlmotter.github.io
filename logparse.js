@@ -107,21 +107,22 @@ var columnDefs = [
     },
     {
         field: 'Level',
-        filter: 'agSetFilter'
+        filter: 'agSetColumnFilter'
     },
     {
         field: 'Type',
-        filter: 'agSetFilter'
+        filter: 'agSetColumnFilter'
     },
     {
         field: 'Scopes',
-        filter: 'agSetFilter',
+        filter: 'agSetColumnFilter',
         cellRenderer: function (param) {
             return param.data.Scopes.join('<br>');
         }
     },
     {
-        field: 'Message',
+        field: 'MessageLines',
+        headerName: 'Message',
         filter: 'agTextColumnFilter',
         cellRenderer: function (param) {
             return param.data.MessageLines.join('<br>');

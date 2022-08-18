@@ -18,6 +18,8 @@ function parseFile() {
         var fileToLoad = fileElement.files[0];
         var fileReader = new FileReader();
         fileReader.onload = function (fileLoadedEvent) {
+            var textAreaElement = document.getElementById('rawText');
+            textAreaElement.value = '';
             var fileText = fileLoadedEvent.target.result;
             var rowData = getLogEntries(fileText);
             gridOptions['api'].setRowData(rowData);
@@ -30,11 +32,13 @@ function parseFile() {
             alert('Select a file');
         }
         else {
-            alert('File upload is not supported by your browser');
+            alert('File upload is not supported by your browser.');
         }
     }
 }
 function parseText() {
+    var fileElement = document.getElementById('file');
+    fileElement.value = '';
     var textAreaElement = document.getElementById('rawText');
     var rowData = getLogEntries(textAreaElement.value);
     gridOptions['api'].setRowData(rowData);

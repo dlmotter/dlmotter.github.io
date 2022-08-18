@@ -24,6 +24,9 @@ function parseFile() {
 
             var fileReader = new FileReader();
             fileReader.onload = function (fileLoadedEvent) {
+                  let textAreaElement = document.getElementById('rawText') as HTMLTextAreaElement;
+                  textAreaElement.value = '';
+
                   var fileText = fileLoadedEvent.target.result as string;
 
                   let rowData = getLogEntries(fileText);
@@ -36,12 +39,15 @@ function parseFile() {
             if (fileElement.value == '') {
                   alert('Select a file');
             } else {
-                  alert('File upload is not supported by your browser');
+                  alert('File upload is not supported by your browser.');
             }
       }
 }
 
 function parseText() {
+      let fileElement = document.getElementById('file') as HTMLInputElement;
+      fileElement.value = '';
+
       let textAreaElement = document.getElementById('rawText') as HTMLTextAreaElement;
 
       let rowData = getLogEntries(textAreaElement.value);

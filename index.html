@@ -1,0 +1,23 @@
+<html>
+
+<head>
+    <script src="https://unpkg.com/ag-grid-enterprise/dist/ag-grid-enterprise.min.noStyle.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/ag-grid-enterprise/styles/ag-grid.css" />
+    <link rel="stylesheet" href="https://unpkg.com/ag-grid-enterprise/styles/ag-theme-alpine.css" />
+    <link rel="stylesheet" href="./logparse.css" />
+    <script src="./logparse.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <input id="file" type="file" onchange="parseFile()">
+            <textarea id="rawText"  onchange="parseText()"></textarea>
+        </div>
+        <div class="grid">
+            <div id="myGrid" class="ag-theme-alpine"></div>
+        </div>
+    </div>
+</body>
+
+</html>

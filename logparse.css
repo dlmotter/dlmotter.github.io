@@ -1,6 +1,6 @@
 html {
     height: 100%;
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
 }
 
 body {
@@ -41,10 +41,40 @@ body {
 }
 
 #rawTextButton {
-    margin-left: 1rem;
+    margin: 0 0 0 1rem;
 }
 
 .ag-row .ag-cell {
     display: flex;
     align-items: center;
-  }
+}
+
+@media screen and (max-width: 1400px) {
+
+    html,
+    body,
+    .container {
+        height: unset;
+    }
+
+    .header {
+        height: unset;
+        flex-direction: column;
+    }
+
+    .header #description {
+        margin: 1rem 0 0 0;
+        align-items: center;
+    }
+
+    #file,
+    #rawText,
+    #rawTextButton {
+        margin: 1rem 0 0 0;
+    }
+
+    .grid {
+        height: calc(100vh - 2rem);
+        flex: unset;
+    }
+}

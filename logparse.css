@@ -24,6 +24,7 @@ body {
 .grid {
     flex: 1;
     padding: 1rem;
+    --ag-line-height: 1.5rem;
 }
 
 .header div {
@@ -42,3 +43,8 @@ body {
 #rawTextButton {
     margin-left: 1rem;
 }
+
+.ag-row .ag-cell {
+    display: flex;
+    align-items: center;
+  }

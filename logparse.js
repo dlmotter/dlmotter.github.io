@@ -61,8 +61,9 @@ function getTimestamp(timestampPart) {
 }
 function getLogEntries(input) {
     try {
-        var headerRegex_1 = /(.*)?(trce|dbug|warn|fail|crit|info): (.*)/;
+        var headerRegex_1 = /(.*)?(trce|dbug|warn|fail|crit|info): ((?:.*)\[(?:[0-9]+)\]) ?(.*)/;
         var lines = input.split(/\r?\n/).filter(function (x) { return !/^\s*$/.test(x); }).map(function (x) { return x.replace(/(\x1b)\[[0-9]+m/g, ''); });
+        var alertedSingleLine_1 = false;
         var currentEntry_1 = new Log();
         var entries_1 = [];
         var currentIndex_1 = 1;
@@ -88,6 +89,14 @@ function getLogEntries(input) {
                 currentEntry_1.Type = parts[3];
                 currentEntry_1.MessageLines = [];
                 currentEntry_1.Scopes = [];
+                // This is a "single line" entry. Header and message are on same line.
+                if (!!parts[4]) {
+                    if (!alertedSingleLine_1) {
+                        alert('Your logs are in "Single Line" mode.\nThere is no reliable way to separate scopes from the message, so they are both included in the Message field.');
+                        alertedSingleLine_1 = true;
+                    }
+                    currentEntry_1.MessageLines.push(parts[4]);
+                }
             }
         });
         // Last entry never gets pushed by the next header, so add it manually
@@ -95,7 +104,7 @@ function getLogEntries(input) {
         return entries_1;
     }
     catch (error) {
-        alert('Could not parse your input. Please make sure it is in the expected format.');
+        alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.');
         return [];
     }
 }

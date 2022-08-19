@@ -76,9 +76,10 @@ function getTimestamp(timestampPart: string): Date {
 
 function getLogEntries(input: string): Log[] {
       try {
-            const headerRegex = /(.*)?(trce|dbug|warn|fail|crit|info): (.*)/;
+            const headerRegex = /(.*)?(trce|dbug|warn|fail|crit|info): ((?:.*)\[(?:[0-9]+)\]) ?(.*)/;
             let lines = input.split(/\r?\n/).filter(x => !/^\s*$/.test(x)).map(x => x.replace(/(\x1b)\[[0-9]+m/g, ''));
 
+            let alertedSingleLine = false;
             let currentEntry = new Log();
             let entries: Log[] = [];
             let currentIndex = 1;
@@ -106,6 +107,16 @@ function getLogEntries(input: string): Log[] {
                         currentEntry.Type = parts[3];
                         currentEntry.MessageLines = [];
                         currentEntry.Scopes = [];
+
+                        // This is a "single line" entry. Header and message are on same line.
+                        if (!!parts[4]) {
+                              if (!alertedSingleLine) {
+                                    alert('Your logs are in "Single Line" mode.\nThere is no reliable way to separate scopes from the message, so they are both included in the Message field.');
+                                    alertedSingleLine = true;
+                              }
+
+                              currentEntry.MessageLines.push(parts[4]);
+                        }
                   }
             });
 
@@ -114,12 +125,12 @@ function getLogEntries(input: string): Log[] {
 
             return entries;
       } catch (error) {
-            alert('Could not parse your input. Please make sure it is in the expected format.');
+            alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.');
             return [];
       }
 }
 
-function autoSizeAll(skipHeader) {
+function autoSizeAll(skipHeader: boolean) {
       const allColumnIds = [];
       gridOptions['columnApi'].getColumns().forEach((column) => {
             allColumnIds.push(column.getId());

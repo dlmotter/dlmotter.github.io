@@ -75,43 +75,48 @@ function getTimestamp(timestampPart: string): Date {
 }
 
 function getLogEntries(input: string): Log[] {
-      const headerRegex = /(.*)?(trce|dbug|warn|fail|crit|info): (.*)/;
-      let lines = input.split(/\r?\n/).filter(x => !/^\s*$/.test(x)).map(x => x.replace(/(\x1b)\[[0-9]+m/g, ''));
+      try {
+            const headerRegex = /(.*)?(trce|dbug|warn|fail|crit|info): (.*)/;
+            let lines = input.split(/\r?\n/).filter(x => !/^\s*$/.test(x)).map(x => x.replace(/(\x1b)\[[0-9]+m/g, ''));
 
-      let currentEntry = new Log();
-      let entries: Log[] = [];
-      let currentIndex = 1;
-      lines.forEach(line => {
-            if (/^\s+=>/.test(line)) {
-                  // Scope line
-                  currentEntry.Scopes = line.split('=>').map(x => x.trim()).filter(Boolean);
-            }
-            else if (/^\s+/.test(line)) {
-                  // Message line
-                  currentEntry.MessageLines.push(line.trim());
-            }
-            else {
-                  // Header line
-                  if (currentIndex > 1) {
-                        entries.push(currentEntry);
+            let currentEntry = new Log();
+            let entries: Log[] = [];
+            let currentIndex = 1;
+            lines.forEach(line => {
+                  if (/^\s+=>/.test(line)) {
+                        // Scope line
+                        currentEntry.Scopes = line.split('=>').map(x => x.trim()).filter(Boolean);
                   }
+                  else if (/^\s+/.test(line)) {
+                        // Message line
+                        currentEntry.MessageLines.push(line.trim());
+                  }
+                  else {
+                        // Header line
+                        if (currentIndex > 1) {
+                              entries.push(currentEntry);
+                        }
 
-                  let parts = line.match(headerRegex);
+                        let parts = line.match(headerRegex);
 
-                  currentEntry = new Log();
-                  currentEntry.Order = currentIndex++;
-                  currentEntry.Timestamp = getTimestamp(parts[1]);
-                  currentEntry.Level = Level[parts[2]];
-                  currentEntry.Type = parts[3];
-                  currentEntry.MessageLines = [];
-                  currentEntry.Scopes = [];
-            }
-      });
+                        currentEntry = new Log();
+                        currentEntry.Order = currentIndex++;
+                        currentEntry.Timestamp = getTimestamp(parts[1]);
+                        currentEntry.Level = Level[parts[2]];
+                        currentEntry.Type = parts[3];
+                        currentEntry.MessageLines = [];
+                        currentEntry.Scopes = [];
+                  }
+            });
 
-      // Last entry never gets pushed by the next header, so add it manually
-      entries.push(currentEntry);
+            // Last entry never gets pushed by the next header, so add it manually
+            entries.push(currentEntry);
 
-      return entries;
+            return entries;
+      } catch (error) {
+            alert('Could not parse your input. Please make sure it is in the expected format.');
+            return [];
+      }
 }
 
 function autoSizeAll(skipHeader) {

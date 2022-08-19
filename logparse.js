@@ -60,38 +60,44 @@ function getTimestamp(timestampPart) {
     return null;
 }
 function getLogEntries(input) {
-    var headerRegex = /(.*)?(trce|dbug|warn|fail|crit|info): (.*)/;
-    var lines = input.split(/\r?\n/).filter(function (x) { return !/^\s*$/.test(x); }).map(function (x) { return x.replace(/(\x1b)\[[0-9]+m/g, ''); });
-    var currentEntry = new Log();
-    var entries = [];
-    var currentIndex = 1;
-    lines.forEach(function (line) {
-        if (/^\s+=>/.test(line)) {
-            // Scope line
-            currentEntry.Scopes = line.split('=>').map(function (x) { return x.trim(); }).filter(Boolean);
-        }
-        else if (/^\s+/.test(line)) {
-            // Message line
-            currentEntry.MessageLines.push(line.trim());
-        }
-        else {
-            // Header line
-            if (currentIndex > 1) {
-                entries.push(currentEntry);
+    try {
+        var headerRegex_1 = /(.*)?(trce|dbug|warn|fail|crit|info): (.*)/;
+        var lines = input.split(/\r?\n/).filter(function (x) { return !/^\s*$/.test(x); }).map(function (x) { return x.replace(/(\x1b)\[[0-9]+m/g, ''); });
+        var currentEntry_1 = new Log();
+        var entries_1 = [];
+        var currentIndex_1 = 1;
+        lines.forEach(function (line) {
+            if (/^\s+=>/.test(line)) {
+                // Scope line
+                currentEntry_1.Scopes = line.split('=>').map(function (x) { return x.trim(); }).filter(Boolean);
             }
-            var parts = line.match(headerRegex);
-            currentEntry = new Log();
-            currentEntry.Order = currentIndex++;
-            currentEntry.Timestamp = getTimestamp(parts[1]);
-            currentEntry.Level = Level[parts[2]];
-            currentEntry.Type = parts[3];
-            currentEntry.MessageLines = [];
-            currentEntry.Scopes = [];
-        }
-    });
-    // Last entry never gets pushed by the next header, so add it manually
-    entries.push(currentEntry);
-    return entries;
+            else if (/^\s+/.test(line)) {
+                // Message line
+                currentEntry_1.MessageLines.push(line.trim());
+            }
+            else {
+                // Header line
+                if (currentIndex_1 > 1) {
+                    entries_1.push(currentEntry_1);
+                }
+                var parts = line.match(headerRegex_1);
+                currentEntry_1 = new Log();
+                currentEntry_1.Order = currentIndex_1++;
+                currentEntry_1.Timestamp = getTimestamp(parts[1]);
+                currentEntry_1.Level = Level[parts[2]];
+                currentEntry_1.Type = parts[3];
+                currentEntry_1.MessageLines = [];
+                currentEntry_1.Scopes = [];
+            }
+        });
+        // Last entry never gets pushed by the next header, so add it manually
+        entries_1.push(currentEntry_1);
+        return entries_1;
+    }
+    catch (error) {
+        alert('Could not parse your input. Please make sure it is in the expected format.');
+        return [];
+    }
 }
 function autoSizeAll(skipHeader) {
     var allColumnIds = [];

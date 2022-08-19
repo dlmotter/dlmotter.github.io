@@ -1,6 +1,8 @@
 html {
     height: 100%;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    background-color: #181d1f;
+    color: white;
 }
 
 body {
@@ -44,8 +46,9 @@ body {
     margin: 0 0 0 1rem;
 }
 
-textarea::placeholder {
+#rawText {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    height: 100%;
 }
 
 .ag-row .ag-cell {
@@ -53,7 +56,7 @@ textarea::placeholder {
     align-items: center;
 }
 
-@media screen and (max-width: 1400px) {
+@media screen and (max-width: 1440px) {
 
     html,
     body,

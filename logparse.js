@@ -106,6 +106,15 @@ function autoSizeAll(skipHeader) {
     });
     gridOptions['columnApi'].autoSizeColumns(allColumnIds, skipHeader);
 }
+function setDarkLight(darkMode) {
+    var gridDiv = document.querySelector('#myGrid');
+    if (darkMode) {
+        gridDiv.className = 'ag-theme-alpine-dark';
+    }
+    else {
+        gridDiv.className = 'ag-theme-alpine';
+    }
+}
 var columnDefs = [
     {
         field: 'Order',
@@ -156,4 +165,10 @@ var gridOptions = {
 document.addEventListener('DOMContentLoaded', function () {
     var gridDiv = document.querySelector('#myGrid');
     new window['agGrid'].Grid(gridDiv, gridOptions);
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        setDarkLight(true);
+    }
+});
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+    setDarkLight(e.matches);
 });

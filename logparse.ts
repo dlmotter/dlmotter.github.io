@@ -128,6 +128,15 @@ function autoSizeAll(skipHeader) {
       gridOptions['columnApi'].autoSizeColumns(allColumnIds, skipHeader);
 }
 
+function setDarkLight(darkMode: boolean) {
+      const gridDiv = document.querySelector('#myGrid');
+      if (darkMode) {
+            gridDiv.className = 'ag-theme-alpine-dark';
+      } else {
+            gridDiv.className = 'ag-theme-alpine';
+      }
+}
+
 const columnDefs = [
       {
             field: 'Order',
@@ -180,5 +189,11 @@ const gridOptions = {
 document.addEventListener('DOMContentLoaded', () => {
       const gridDiv = document.querySelector('#myGrid');
       new window['agGrid'].Grid(gridDiv, gridOptions);
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            setDarkLight(true);
+      }
+});
 
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      setDarkLight(e.matches);
 });

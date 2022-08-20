@@ -12,18 +12,25 @@ var Level;
     Level["crit"] = "Critical";
     Level["info"] = "Information";
 })(Level || (Level = {}));
+function clearFile() {
+    var fileElement = document.getElementById('file');
+    fileElement.value = '';
+}
+function clearText() {
+    var textAreaElement = document.getElementById('rawText');
+    textAreaElement.value = '';
+}
 function parseFile() {
     var fileElement = document.getElementById('file');
     if ('files' in fileElement) {
         var fileToLoad = fileElement.files[0];
         var fileReader = new FileReader();
         fileReader.onload = function (fileLoadedEvent) {
-            var textAreaElement = document.getElementById('rawText');
-            textAreaElement.value = '';
             var fileText = fileLoadedEvent.target.result;
             var rowData = getLogEntries(fileText);
             gridOptions['api'].setRowData(rowData);
             autoSizeAll(false);
+            clearText();
         };
         fileReader.readAsText(fileToLoad, 'UTF-8');
     }
@@ -37,12 +44,12 @@ function parseFile() {
     }
 }
 function parseText() {
-    var fileElement = document.getElementById('file');
-    fileElement.value = '';
     var textAreaElement = document.getElementById('rawText');
     var rowData = getLogEntries(textAreaElement.value);
     gridOptions['api'].setRowData(rowData);
     autoSizeAll(false);
+    clearText();
+    clearFile();
 }
 function getTimestamp(timestampPart) {
     if (!timestampPart) {

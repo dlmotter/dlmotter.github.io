@@ -16,22 +16,30 @@ enum Level {
       info = "Information"
 }
 
+function clearFile() {
+      let fileElement = document.getElementById('file') as HTMLInputElement;
+      fileElement.value = '';
+}
+
+function clearText() {
+      let textAreaElement = document.getElementById('rawText') as HTMLTextAreaElement;
+      textAreaElement.value = '';
+}
+
 function parseFile() {
       let fileElement = document.getElementById('file') as HTMLInputElement;
 
       if ('files' in fileElement) {
-            var fileToLoad = fileElement.files[0];
-
-            var fileReader = new FileReader();
+            let fileToLoad = fileElement.files[0];
+            let fileReader = new FileReader();      
             fileReader.onload = function (fileLoadedEvent) {
-                  let textAreaElement = document.getElementById('rawText') as HTMLTextAreaElement;
-                  textAreaElement.value = '';
-
-                  var fileText = fileLoadedEvent.target.result as string;
-
+                  let fileText = fileLoadedEvent.target.result as string;
                   let rowData = getLogEntries(fileText);
                   gridOptions['api'].setRowData(rowData);
+
                   autoSizeAll(false);
+
+                  clearText();
             };
 
             fileReader.readAsText(fileToLoad, 'UTF-8');
@@ -45,14 +53,14 @@ function parseFile() {
 }
 
 function parseText() {
-      let fileElement = document.getElementById('file') as HTMLInputElement;
-      fileElement.value = '';
-
       let textAreaElement = document.getElementById('rawText') as HTMLTextAreaElement;
-
       let rowData = getLogEntries(textAreaElement.value);
       gridOptions['api'].setRowData(rowData);
+
       autoSizeAll(false);
+
+      clearText();
+      clearFile();
 }
 
 function getTimestamp(timestampPart: string): Date {

@@ -65,6 +65,7 @@ body {
 
 #about {
     max-width: 630px;
+    width: calc(100% - 2rem);
 }
 
 #about h1 {

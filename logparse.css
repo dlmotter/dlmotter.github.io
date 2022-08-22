@@ -75,6 +75,10 @@ body {
     padding-bottom: 1rem;
 }
 
+.small {
+    font-size: small;
+}
+
 @media screen and (max-width: 1440px) {
 
     html,

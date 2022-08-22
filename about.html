@@ -28,7 +28,7 @@
 			<h2>Basics of .NET Logging</h2>
 			<h3>Configuration</h3>
 			<p>
-				Logging in .NET is configured in your <code>Startup.cs</code> code like this:
+				Logging in .NET is configured in your <code>Startup.cs</code> or <code>Program.cs</code> code like this:
 			</p>
 			<pre><code class="language-csharp">
 builder.Services.AddLogging(loggingBuilder =>
@@ -171,7 +171,7 @@ using (_logger.BeginScope($"Scope 1"))
 						Scopes
 					</h3>
 					<p>
-						Any scopes are all added on the next line with a <code>=&gt; </code> preceding each one.
+						Scopes are all added on the next line with a <code>=&gt; </code> preceding each one.
 					</p>
 					<p>
 						If a log does not have any scopes, this line will be omitted.

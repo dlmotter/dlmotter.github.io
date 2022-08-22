@@ -13,8 +13,10 @@
 
     <title>LogParse.net</title>
     <meta property="og:title" content="LogParse.net">
-    <meta name="description" content="Simply and easily process and parse logs from .NET directly in the browser. No download or login required.">
-    <meta property="og:description" content="Simply and easily process and parse logs from .NET directly in the browser. No download or login required.">
+    <meta name="description"
+        content="Simply and easily process and parse logs from .NET directly in the browser. No download or login required.">
+    <meta property="og:description"
+        content="Simply and easily process and parse logs from .NET directly in the browser. No download or login required.">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -34,14 +36,15 @@
         <div class="header">
             <div id="title">LogParse.net</div>
             <div id="description">
-                <div>Simply and easily process logs from .NET.</div>
-                <div>Just upload a log file, or paste in the plain text and click "Process Text".</div>
-                <div>If you are processing a lot of logs, uploading a file works best.</div>
+                <div>Simply and easily process .NET logs directly in-browser.</div>
+                <div>Just upload a file or paste in the plain text and click "Process Text".</div>
+                <div>If you are processing a lot of logs, uploading a file works best!</div>
             </div>
             <input id="file" type="file" onchange="parseFile()">
             <div id="or">or</div>
             <textarea id="rawText" placeholder="Paste logs here"></textarea>
             <button id="rawTextButton" onclick="parseText()">Process Text</button>
+            <a id="aboutLink" href="./about.html" target="_blank">About</a>
         </div>
         <div class="grid">
             <div id="myGrid" class="ag-theme-alpine"></div>

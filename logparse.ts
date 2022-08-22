@@ -54,13 +54,15 @@ function parseFile() {
 
 function parseText() {
       let textAreaElement = document.getElementById('rawText') as HTMLTextAreaElement;
-      let rowData = getLogEntries(textAreaElement.value);
-      gridOptions['api'].setRowData(rowData);
-
-      autoSizeAll(false);
-
-      clearText();
-      clearFile();
+      if (!!textAreaElement.value.trim()) {
+            let rowData = getLogEntries(textAreaElement.value);
+            gridOptions['api'].setRowData(rowData);
+      
+            autoSizeAll(false);
+      
+            clearText();
+            clearFile();
+      }
 }
 
 function getTimestamp(timestampPart: string): Date {
@@ -119,7 +121,7 @@ function getLogEntries(input: string): Log[] {
                         // This is a "single line" entry. Header and message are on same line.
                         if (!!parts[4]) {
                               if (!alertedSingleLine) {
-                                    alert('Your logs are in "Single Line" mode.\nThere is no reliable way to separate scopes from the message, so they are both included in the Message field.');
+                                    alert('Your logs are in "Single Line" mode.\nThere is no reliable way to separate scopes from the message, so they are both included in the Message field.\nSee the "About" page for more details.');
                                     alertedSingleLine = true;
                               }
 
@@ -133,7 +135,7 @@ function getLogEntries(input: string): Log[] {
 
             return entries;
       } catch (error) {
-            alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.');
+            alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.\nSee the "About" page for more details.');
             return [];
       }
 }

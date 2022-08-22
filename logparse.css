@@ -45,13 +45,34 @@ body {
 }
 
 #rawText {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     height: 100%;
+}
+
+#aboutLink {
+    margin-left: auto;
 }
 
 .ag-row .ag-cell {
     display: flex;
     align-items: center;
+}
+
+#aboutcontainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#about {
+    max-width: 630px;
+}
+
+#about h1 {
+    padding-bottom: 1rem;
+}
+
+#about h2 {
+    padding-bottom: 1rem;
 }
 
 @media screen and (max-width: 1440px) {
@@ -75,7 +96,8 @@ body {
 
     #file,
     #rawText,
-    #rawTextButton {
+    #rawTextButton,
+    #aboutLink {
         margin: 1rem 0 0 0;
     }
 

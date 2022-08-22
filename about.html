@@ -1,0 +1,226 @@
+<html>
+
+<head>
+	<title>LogParse.net - About</title>
+	<meta property="og:title" content="LogParse.net - About">
+	<meta name="description"
+		content="Simply and easily process and parse logs from .NET directly in the browser. No download or login required.">
+	<meta property="og:description"
+		content="Simply and easily process and parse logs from .NET directly in the browser. No download or login required.">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="application-name" content="LogParse.net">
+	<meta name="robots" content="index, follow">
+	<link rel="canonical" href="https://logparse.net/about.html" />
+
+	<link rel="stylesheet" href="./logparse.css" />
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/atom-one-dark.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+	<script>hljs.highlightAll();</script>
+</head>
+
+<body>
+	<div id="aboutcontainer">
+		<div id="about">
+			<h1>About</h1>
+			<h2>Basics of .NET Logging</h2>
+			<h3>Configuration</h3>
+			<p>
+				Logging in .NET is configured in your <code>Startup.cs</code> code like this:
+			</p>
+			<pre><code class="language-csharp">
+builder.Services.AddLogging(loggingBuilder =>
+{
+	loggingBuilder.AddSimpleConsole(options =>
+	{
+		options.IncludeScopes = true;
+		options.UseUtcTimestamp = true;
+		options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
+	});
+});
+			</code></pre>
+			<p>
+				If no <code>TimestampFormat</code> is specified, a timestamp will not be included in the logs and the
+				Timestamp field will be blank.
+			</p>
+			<h3>Getting an ILogger&lt;T&gt;</h3>
+			<p>
+				Within your code, you will generally interact with the logging framework through an
+				instance of <code>ILogger&lt;T&gt;</code>,
+				where <code>&lt;T&gt;</code> is a generic type paramter, and is usually the type of the class the logger
+				is used in.
+			</p>
+			<p>
+				The preferred method of getting an <code>ILogger&lt;T&gt;</code> is through dependency injection.
+				Simply add one to your class parameters and it will be injected and ready for use.
+			</p>
+			<p>
+				In static classes, or other situations where DI doesn't work, you can use the
+				<a
+					href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.loggerfactory?view=dotnet-plat-ext-6.0">LoggerFactory</a>
+				class.
+			</p>
+			<p>
+				You can also use the service locator (anti)pattern to obtain one, although this is not a recommended
+				approach and should only be used when absolutely necessary.
+			</p>
+			<h3>Writing Logs</h3>
+			<p>
+				The normal approach is to assign the injected <code>ILogger&lt;T&gt;</code> to a
+				<code>private readonly</code> variable,
+				usually named <code>_logger</code> or something similar.
+			</p>
+			<p>
+				Use <code>_logger</code> to write logs. You can use a method like <code>.LogTrace</code>,
+				<code>.LogDebug</code>, and so on, or you can use <code>.Log</code>, and specify the level in the
+				parameters.
+			</p>
+			<h3>Adding Scopes</h3>
+			<p>
+				Scopes are added to logs within a <code>using</code> statement with the <code>.BeginScope</code> method
+				on the <code>ILogger&lt;T&gt;</code>
+			</p>
+			<p>
+				Any log that is written at any level inside this scope will have the scope added to it, and multiple
+				scopes can be added to a log.
+			</p>
+			<pre><code class="language-csharp">
+using (_logger.BeginScope($"Scope 1"))
+{
+	using (_logger.BeginScope($"Scope 2"))
+	{
+		// This will be a multiline log at the "Debug" level, with "Scope 1" and "Scope 2" on it
+		_logger.LogDebug("Lorem ipsum dolor sit amet, consectetur adipiscing elit.\r\nProin malesuada, turpis dictum interdum egestas.");
+	} 
+} 
+			</code></pre>
+			<h2>Log format</h2>
+			<p>
+				The final log format looks like this:
+			</p>
+			<pre><code class="language-plaintext">
+(Timestamp in whatever format you specify, optional)(level): (type)
+      => Scope 1 => Scope 2
+      Message Line 1
+      Message Line 2
+			</code></pre>
+			<ul>
+				<li>
+					<h3>
+						Timestamp
+					</h3>
+					<p>
+						If no <code>TimestampFormat</code> is specified in the config, the log entry will simply start
+						with
+						<strong>level</strong>.
+					</p>
+				</li>
+				<li>
+					<h3>
+						Level
+					</h3>
+					<p>
+						The logs use a shorthand 4 character string corresponding to the full log level for brevity:
+					</p>
+					<table>
+						<tr>
+							<td><code>trce</code></td>
+							<td>=</td>
+							<td>Trace</td>
+						</tr>
+						<tr>
+							<td><code>dbug</code></td>
+							<td>=</td>
+							<td>Debug</td>
+						</tr>
+						<tr>
+							<td><code>info</code></td>
+							<td>=</td>
+							<td>Information</td>
+						</tr>
+						<tr>
+							<td><code>warn</code></td>
+							<td>=</td>
+							<td>Warning</td>
+						</tr>
+						<tr>
+							<td><code>fail</code></td>
+							<td>=</td>
+							<td>Error</td>
+						</tr>
+						<tr>
+							<td><code>crit</code></td>
+							<td>=</td>
+							<td>Critical</td>
+						</tr>
+					</table>
+				</li>
+				<li>
+					<h3>
+						Type
+					</h3>
+					<p>
+						<strong>type</strong> is the type provided to the <code>ILogger&lt;T&gt;</code> used to produce
+						the log.
+					</p>
+				</li>
+				<li>
+					<h3>
+						Scopes
+					</h3>
+					<p>
+						Any scopes are all added on the next line with a <code>=&gt; </code> preceding each one.
+					</p>
+					<p>
+						If a log does not have any scopes, this line will be omitted.
+					</p>
+				</li>
+				<li>
+					<h3>
+						Message
+					</h3>
+					<p>
+						Any number of message lines follow the scopes.
+					</p>
+				</li>
+			</ul>
+			<h2>Examples</h2>
+			<p>
+				So, the full log entry would look like this:
+			</p>
+			<pre><code class="language-plaintext">
+[2022-08-19 21:34:16.196] dbug: MyProgram[0]
+      => Scope 1 => Scope 2
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      Proin malesuada, turpis dictum interdum egestas.
+			</code></pre>
+			<p>
+				You can also specify <code>options.SingleLine</code> when you configure logging to make every log entry
+				take
+				only one line.
+			</p>
+			<p>
+				That would look like this instead:
+			</p>
+			<pre><code class="language-plaintext">
+[2022-08-19 21:34:16.196] dbug: MyProgram[0] => Scope 1 => Scope 2 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin malesuada, turpis dictum interdum egestas.
+			</code></pre>
+			<p>
+				In this mode, there is no way to tell where the last scope ends and the message text begins.
+			</p>
+			<p>
+				So, the entire text after the <strong>type</strong> is placed in the Message field.
+			</p>
+			<h2>Non-standard formats</h3>
+				<p>
+					If your logs are in a custom format, or you use a 3rd party logging solution like NLog, Serilog, or
+					log4net,
+					LogParse.net may not be able to parse them - it expects logs in the native .NET format.
+				</p>
+		</div>
+	</div>
+</body>
+
+</html>

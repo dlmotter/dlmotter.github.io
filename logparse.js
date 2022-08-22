@@ -45,11 +45,13 @@ function parseFile() {
 }
 function parseText() {
     var textAreaElement = document.getElementById('rawText');
-    var rowData = getLogEntries(textAreaElement.value);
-    gridOptions['api'].setRowData(rowData);
-    autoSizeAll(false);
-    clearText();
-    clearFile();
+    if (!!textAreaElement.value.trim()) {
+        var rowData = getLogEntries(textAreaElement.value);
+        gridOptions['api'].setRowData(rowData);
+        autoSizeAll(false);
+        clearText();
+        clearFile();
+    }
 }
 function getTimestamp(timestampPart) {
     if (!timestampPart) {
@@ -99,7 +101,7 @@ function getLogEntries(input) {
                 // This is a "single line" entry. Header and message are on same line.
                 if (!!parts[4]) {
                     if (!alertedSingleLine_1) {
-                        alert('Your logs are in "Single Line" mode.\nThere is no reliable way to separate scopes from the message, so they are both included in the Message field.');
+                        alert('Your logs are in "Single Line" mode.\nThere is no reliable way to separate scopes from the message, so they are both included in the Message field.\nSee the "About" page for more details.');
                         alertedSingleLine_1 = true;
                     }
                     currentEntry_1.MessageLines.push(parts[4]);
@@ -111,7 +113,7 @@ function getLogEntries(input) {
         return entries_1;
     }
     catch (error) {
-        alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.');
+        alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.\nSee the "About" page for more details.');
         return [];
     }
 }

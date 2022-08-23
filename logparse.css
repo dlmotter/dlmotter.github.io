@@ -112,6 +112,16 @@ body {
     }
 }
 
+@media screen and (max-width: 500px) {
+    .header #description div {
+        margin-bottom: .5rem;
+    }
+
+    .wbr {
+        display: block;
+    }
+}
+
 @media (prefers-color-scheme: dark) {
     html {
         background-color: #181d1f;

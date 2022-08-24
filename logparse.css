@@ -68,6 +68,10 @@ a:visited {
     flex-direction: column;
 }
 
+#file {
+    width: 14rem;
+}
+
 #rawTextButton {
     margin: 0 0 0 1rem;
 }
@@ -76,8 +80,10 @@ a:visited {
     height: 100%;
 }
 
-#aboutLink {
+#links {
     margin-left: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .ag-row .ag-cell {
@@ -85,22 +91,22 @@ a:visited {
     align-items: center;
 }
 
-#aboutcontainer {
+#container {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-#about {
+#content {
     max-width: 630px;
     width: calc(100% - 2rem);
 }
 
-#about h1 {
+#content h1 {
     padding-bottom: 1rem;
 }
 
-#about h2 {
+#content h2 {
     padding-bottom: 1rem;
 }
 
@@ -108,7 +114,7 @@ a:visited {
     font-size: small;
 }
 
-@media screen and (max-width: 1440px) {
+@media screen and (max-width: 1536px) {
 
     html,
     body,
@@ -130,8 +136,12 @@ a:visited {
     #file,
     #rawText,
     #rawTextButton,
-    #aboutLink {
+    #links {
         margin: 1rem 0 0 0;
+    }
+
+    #links {
+        align-items: center;
     }
 
     .grid {

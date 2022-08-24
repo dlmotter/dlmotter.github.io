@@ -11,6 +11,22 @@ body {
     height: 100%;
 }
 
+button,
+input[type=file]::file-selector-button {
+    background: #19647E;
+    color: #FFF;
+    padding: .5rem 1rem;
+    border: none;
+    border-radius: .5rem;
+    cursor: pointer;
+    transition: background .2s ease-in-out;
+}
+
+button:hover,
+input[type=file]::file-selector-button:hover {
+    background: #124658;
+}
+
 a,
 a:visited {
     color: #034748;

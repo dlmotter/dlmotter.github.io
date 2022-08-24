@@ -1,11 +1,19 @@
 html {
     height: 100%;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-family: 'Nunito', 'Arial', sans-serif;
+
+    color: #19647E;
+    background-color: #E5E5E5;
 }
 
 body {
     margin: 0;
     height: 100%;
+}
+
+a,
+a:visited {
+    color: #034748;
 }
 
 .container {
@@ -19,6 +27,10 @@ body {
     display: flex;
     padding: 1rem 1rem 0 1rem;
     align-items: center;
+}
+
+.title-emph {
+    font-weight: bold;
 }
 
 .grid {
@@ -124,7 +136,12 @@ body {
 
 @media (prefers-color-scheme: dark) {
     html {
-        background-color: #181d1f;
-        color: white;
+        background-color: #071e26;
+        color: #d1e0e5;
+    }
+
+    a,
+    a:visited {
+        color: #75a2b2;
     }
 }

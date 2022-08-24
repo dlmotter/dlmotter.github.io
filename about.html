@@ -17,6 +17,7 @@
 	<link rel="stylesheet" href="./logparse.css" />
 	<link rel="stylesheet"
 		href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/atom-one-dark.min.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
 	<script>hljs.highlightAll();</script>
 </head>
@@ -49,7 +50,8 @@ builder.Services.AddLogging(loggingBuilder =>
 			<p>
 				Within your code, you will generally interact with the logging framework through an
 				instance of <code>ILogger&lt;T&gt;</code>,
-				where <code>&lt;T&gt;</code> is a generic type parameter, and is usually the type of the class the logger
+				where <code>&lt;T&gt;</code> is a generic type parameter, and is usually the type of the class the
+				logger
 				is used in.
 			</p>
 			<p>

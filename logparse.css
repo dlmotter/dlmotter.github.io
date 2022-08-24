@@ -55,6 +55,10 @@ a:visited {
     --ag-line-height: 1.5rem;
 }
 
+#logsGrid {
+    height: 100%;
+}
+
 .header div {
     margin: 0 1rem;
 }

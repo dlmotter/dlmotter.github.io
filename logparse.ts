@@ -150,7 +150,7 @@ function autoSizeAll(skipHeader: boolean) {
 }
 
 function setDarkLight(darkMode: boolean) {
-      const gridDiv = document.querySelector('#myGrid');
+      const gridDiv = document.querySelector('#logsGrid');
       if (darkMode) {
             gridDiv.className = 'ag-theme-alpine-dark';
       } else {
@@ -208,7 +208,7 @@ const gridOptions = {
 
 // setup the grid after the page has finished loading
 document.addEventListener('DOMContentLoaded', () => {
-      const gridDiv = document.querySelector('#myGrid');
+      const gridDiv = document.querySelector('#logsGrid');
       new window['agGrid'].Grid(gridDiv, gridOptions);
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             setDarkLight(true);

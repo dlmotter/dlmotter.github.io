@@ -17,9 +17,9 @@
 	<link rel="canonical" href="https://logparse.net/about.html" />
 
 	<!-- Icons -->
-	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
 
 	<!-- Font -->
 	<link rel="preload" href="https://fonts.googleapis.com/css?family=Nunito&display=swap" as="style">
@@ -47,17 +47,17 @@
 			<pre><code class="language-csharp">
 builder.Services.AddLogging(loggingBuilder =>
 {
-	loggingBuilder.AddSimpleConsole(options =>
-	{
-		options.IncludeScopes = true;
-		options.UseUtcTimestamp = true;
-		options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
-	});
+    loggingBuilder.AddSimpleConsole(options =>
+    {
+        options.IncludeScopes = true;
+        options.UseUtcTimestamp = true;
+        options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
+    });
 });
 			</code></pre>
 			<p>
 				If no <code>TimestampFormat</code> is specified, a timestamp will not be included in the logs and the
-				Timestamp field will be blank.
+				Timestamp field on LogParse.net will be blank.
 			</p>
 			<h3>Getting an ILogger&lt;T&gt;</h3>
 			<p>
@@ -73,8 +73,8 @@ builder.Services.AddLogging(loggingBuilder =>
 			</p>
 			<p>
 				In static classes, or other situations where DI doesn't work, you can use the
-				<a
-					href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.loggerfactory?view=dotnet-plat-ext-6.0">LoggerFactory</a>
+				<a href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.loggerfactory?view=dotnet-plat-ext-6.0"
+					target="_blank">LoggerFactory</a>
 				class.
 			</p>
 			<p>
@@ -104,11 +104,11 @@ builder.Services.AddLogging(loggingBuilder =>
 			<pre><code class="language-csharp">
 using (_logger.BeginScope($"Scope 1"))
 {
-	using (_logger.BeginScope($"Scope 2"))
-	{
-		// This will be a multiline log at the "Debug" level, with "Scope 1" and "Scope 2" on it
-		_logger.LogDebug("Lorem ipsum dolor sit amet, consectetur adipiscing elit.\r\nProin malesuada, turpis dictum interdum egestas.");
-	} 
+    using (_logger.BeginScope($"Scope 2"))
+    {
+        // This will be a multiline log at the "Debug" level, with "Scope 1" and "Scope 2" on it
+        _logger.LogDebug("Lorem ipsum dolor sit amet, consectetur adipiscing elit.\r\nProin malesuada, turpis dictum interdum egestas.");
+    } 
 } 
 			</code></pre>
 			<h2>Log format</h2>
@@ -177,7 +177,7 @@ using (_logger.BeginScope($"Scope 1"))
 						Type
 					</h3>
 					<p>
-						<strong>type</strong> is the type provided to the <code>ILogger&lt;T&gt;</code> used to produce
+						<strong>type</strong> is the generic type provided to the <code>ILogger&lt;T&gt;</code> used to produce
 						the log.
 					</p>
 				</li>
@@ -198,6 +198,9 @@ using (_logger.BeginScope($"Scope 1"))
 					</h3>
 					<p>
 						Any number of message lines follow the scopes.
+					</p>
+					<p>
+						Lines are separated with the carriage return/new line characters: <code>\r\n</code>
 					</p>
 				</li>
 			</ul>

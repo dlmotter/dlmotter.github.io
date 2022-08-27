@@ -118,6 +118,21 @@ a:visited {
     font-size: small;
 }
 
+.filter-container {
+    padding: 12px;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    height: 24px;
+}
+
+.filter-item-label {
+    order: 1;
+    margin-left:var(--ag-grid-size);
+}
+
 @media screen and (max-width: 1536px) {
 
     html,

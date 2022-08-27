@@ -1,33 +1,151 @@
-var Log = /** @class */ (function () {
-    function Log() {
-    }
-    return Log;
-}());
+class Log {
+}
 var Level;
 (function (Level) {
     Level["trce"] = "Trace";
     Level["dbug"] = "Debug";
+    Level["info"] = "Information";
     Level["warn"] = "Warning";
     Level["fail"] = "Error";
     Level["crit"] = "Critical";
-    Level["info"] = "Information";
 })(Level || (Level = {}));
+class LevelFilter {
+    constructor() {
+        this.agChecked = 'ag-checked';
+        this.agIndet = 'ag-indeterminate';
+        this.selectAll = 'selectAll';
+        this.levelCounts = {};
+        this.levelSelections = {};
+        this.cbWrapperMap = {};
+    }
+    init(params) {
+        this.initParams = params;
+        // Calculate level counts
+        Object.keys(Level).forEach(level => {
+            this.levelCounts[Level[level]] = 0;
+        });
+        params.api.forEachLeafNode(row => {
+            this.levelCounts[row.data.Level]++;
+        });
+        // Calculate initial GUI
+        this.eGui = document.createElement('div');
+        let itemTemplate = `
+                  <div class="filter-item">
+                        <div id="#ID#Lbl" class="filter-item-label">#LABEL#</div>
+                        <div id="#ID#CbWrapper" class="ag-wrapper ag-input-wrapper ag-checkbox-input-wrapper ag-checked">
+                              <input id="#ID#Cb" type="checkbox" class="ag-input-field-input ag-checkbox-input">
+                        </div>
+                  </div>`;
+        let itemsHtml = itemTemplate.replace(/#ID#/g, this.selectAll).replace(/#LABEL#/g, '(Select All)');
+        Object.keys(Level).forEach(level => {
+            itemsHtml += itemTemplate.replace(/#ID#/g, level).replace(/#LABEL#/g, `${Level[level]} (${this.levelCounts[Level[level]]})`);
+        });
+        this.eGui.innerHTML = `<div class="filter-container">${itemsHtml}</div>`;
+        // Set up listeners
+        this.cbWrapperMap[this.selectAll] = this.eGui.querySelector(`#${this.selectAll}CbWrapper`);
+        this.eGui.querySelector(`#${this.selectAll}Lbl`).addEventListener('click', this.onCheckboxClick.bind(this, this.selectAll));
+        this.eGui.querySelector(`#${this.selectAll}Cb`).addEventListener('click', this.onCheckboxClick.bind(this, this.selectAll));
+        Object.keys(Level).forEach(level => {
+            this.cbWrapperMap[level] = this.eGui.querySelector(`#${level}CbWrapper`);
+            this.eGui.querySelector(`#${level}Lbl`).addEventListener('click', this.onCheckboxClick.bind(this, level));
+            this.eGui.querySelector(`#${level}Cb`).addEventListener('click', this.onCheckboxClick.bind(this, level));
+        });
+    }
+    getGui() {
+        return this.eGui;
+    }
+    onCheckboxClick(level) {
+        // Change value of the clicked checkbox
+        let cb = this.cbWrapperMap[level];
+        if (cb.classList.contains(this.agChecked)) {
+            cb.classList.remove(this.agChecked);
+        }
+        else if (cb.classList.contains(this.agIndet)) {
+            cb.classList.remove(this.agIndet);
+            cb.classList.add(this.agChecked);
+        }
+        else {
+            cb.classList.add(this.agChecked);
+        }
+        // Set side effects
+        let selectAllCb = this.cbWrapperMap[this.selectAll];
+        if (level === this.selectAll) {
+            // Set normal ones based on "Select All"
+            let checking = selectAllCb.classList.contains(this.agChecked);
+            Object.entries(this.cbWrapperMap).forEach(([_, val]) => {
+                let el = val;
+                if (checking && !el.classList.contains(this.agChecked)) {
+                    el.classList.add(this.agChecked);
+                }
+                else if (!checking && el.classList.contains(this.agChecked)) {
+                    el.classList.remove(this.agChecked);
+                }
+            });
+        }
+        else {
+            // Set "Select All"
+            let levelWrappers = Object.entries(this.cbWrapperMap).filter(([key, _]) => key !== this.selectAll);
+            let checkedCnt = levelWrappers.filter(([_, val]) => val.classList.contains(this.agChecked)).length;
+            if (checkedCnt === 0) {
+                selectAllCb.classList.remove(this.agChecked);
+                selectAllCb.classList.remove(this.agIndet);
+            }
+            else if (checkedCnt < levelWrappers.length) {
+                selectAllCb.classList.remove(this.agChecked);
+                selectAllCb.classList.add(this.agIndet);
+            }
+            else {
+                selectAllCb.classList.add(this.agChecked);
+                selectAllCb.classList.remove(this.agIndet);
+            }
+        }
+        // Save off final values
+        Object.keys(Level).forEach(level => {
+            this.levelSelections[Level[level]] = this.cbWrapperMap[level].classList.contains(this.agChecked);
+        });
+        // Tell grid we changed
+        this.initParams.filterChangedCallback();
+    }
+    isFilterActive() {
+        return Object.entries(this.levelSelections).filter(([_, val]) => !val).length > 0;
+    }
+    doesFilterPass(params) {
+        return this.levelSelections[params.data.Level];
+    }
+    getModel() {
+    }
+    setModel() {
+    }
+    onNewRowsLoaded() {
+        // Reset and recompute the count of each level
+        Object.keys(this.levelCounts).forEach(key => {
+            this.levelCounts[key] = 0;
+        });
+        this.initParams.api.forEachLeafNode(row => {
+            this.levelCounts[row.data.Level]++;
+        });
+        // Set the labels in the filter
+        Object.keys(Level).forEach(level => {
+            this.eGui.querySelector(`#${level}Lbl`).innerText = `${Level[level]} (${this.levelCounts[Level[level]]})`;
+        });
+    }
+}
 function clearFile() {
-    var fileElement = document.getElementById('file');
+    let fileElement = document.getElementById('file');
     fileElement.value = '';
 }
 function clearText() {
-    var textAreaElement = document.getElementById('rawText');
+    let textAreaElement = document.getElementById('rawText');
     textAreaElement.value = '';
 }
 function parseFile() {
-    var fileElement = document.getElementById('file');
+    let fileElement = document.getElementById('file');
     if ('files' in fileElement) {
-        var fileToLoad = fileElement.files[0];
-        var fileReader = new FileReader();
+        let fileToLoad = fileElement.files[0];
+        let fileReader = new FileReader();
         fileReader.onload = function (fileLoadedEvent) {
-            var fileText = fileLoadedEvent.target.result;
-            var rowData = getLogEntries(fileText);
+            let fileText = fileLoadedEvent.target.result;
+            let rowData = getLogEntries(fileText);
             gridOptions['api'].setRowData(rowData);
             autoSizeAll(false);
             clearText();
@@ -44,9 +162,9 @@ function parseFile() {
     }
 }
 function parseText() {
-    var textAreaElement = document.getElementById('rawText');
+    let textAreaElement = document.getElementById('rawText');
     if (!!textAreaElement.value.trim()) {
-        var rowData = getLogEntries(textAreaElement.value);
+        let rowData = getLogEntries(textAreaElement.value);
         gridOptions['api'].setRowData(rowData);
         autoSizeAll(false);
         clearText();
@@ -57,10 +175,10 @@ function getTimestamp(timestampPart) {
     if (!timestampPart) {
         return null;
     }
-    var originalLength = timestampPart.length;
-    for (var skip = 0; skip < originalLength; skip++) {
-        for (var drop = 0; drop < originalLength - skip; drop++) {
-            var attempt = timestampPart.substring(skip, originalLength - drop) + 'Z';
+    let originalLength = timestampPart.length;
+    for (let skip = 0; skip < originalLength; skip++) {
+        for (let drop = 0; drop < originalLength - skip; drop++) {
+            let attempt = timestampPart.substring(skip, originalLength - drop) + 'Z';
             if (!isNaN(Date.parse(attempt))) {
                 return new Date(attempt);
             }
@@ -70,47 +188,48 @@ function getTimestamp(timestampPart) {
 }
 function getLogEntries(input) {
     try {
-        var headerRegex_1 = /(.*)?(trce|dbug|warn|fail|crit|info): ((?:.*)\[(?:[0-9]+)\]) ?(.*)/;
-        var lines = input.split(/\r?\n/).filter(function (x) { return !/^\s*$/.test(x); }).map(function (x) { return x.replace(/(\x1b)\[[0-9]+m/g, ''); });
-        var alertedSingleLine_1 = false;
-        var currentEntry_1 = new Log();
-        var entries_1 = [];
-        var currentIndex_1 = 1;
-        lines.forEach(function (line) {
+        const headerRegex = /(.*)?(trce|dbug|warn|fail|crit|info): (.*)\[([0-9]+)\] ?(.*)/;
+        let lines = input.split(/\r?\n/).filter(x => !/^\s*$/.test(x)).map(x => x.replace(/(\x1b)\[[0-9]+m/g, ''));
+        let alertedSingleLine = false;
+        let currentEntry = new Log();
+        let entries = [];
+        let currentIndex = 1;
+        lines.forEach(line => {
             if (/^\s+=>/.test(line)) {
                 // Scope line
-                currentEntry_1.Scopes = line.split('=>').map(function (x) { return x.trim(); }).filter(Boolean);
+                currentEntry.Scopes = line.split('=>').map(x => x.trim()).filter(Boolean);
             }
             else if (/^\s+/.test(line)) {
                 // Message line
-                currentEntry_1.MessageLines.push(line.trim());
+                currentEntry.MessageLines.push(line.trim());
             }
             else {
                 // Header line
-                if (currentIndex_1 > 1) {
-                    entries_1.push(currentEntry_1);
+                if (currentIndex > 1) {
+                    entries.push(currentEntry);
                 }
-                var parts = line.match(headerRegex_1);
-                currentEntry_1 = new Log();
-                currentEntry_1.Order = currentIndex_1++;
-                currentEntry_1.Timestamp = getTimestamp(parts[1]);
-                currentEntry_1.Level = Level[parts[2]];
-                currentEntry_1.Type = parts[3];
-                currentEntry_1.MessageLines = [];
-                currentEntry_1.Scopes = [];
+                let parts = line.match(headerRegex);
+                currentEntry = new Log();
+                currentEntry.Order = currentIndex++;
+                currentEntry.Timestamp = getTimestamp(parts[1]);
+                currentEntry.Level = Level[parts[2]];
+                currentEntry.Type = parts[3];
+                currentEntry.EventId = parseInt(parts[4]);
+                currentEntry.MessageLines = [];
+                currentEntry.Scopes = [];
                 // This is a "single line" entry. Header and message are on same line.
-                if (!!parts[4]) {
-                    if (!alertedSingleLine_1) {
+                if (!!parts[5]) {
+                    if (!alertedSingleLine) {
                         alert('Your logs are in "Single Line" mode.\nThere is no reliable way to separate scopes from the message, so they are both included in the Message field.\nSee the "About" page for more details.');
-                        alertedSingleLine_1 = true;
+                        alertedSingleLine = true;
                     }
-                    currentEntry_1.MessageLines.push(parts[4]);
+                    currentEntry.MessageLines.push(parts[5]);
                 }
             }
         });
         // Last entry never gets pushed by the next header, so add it manually
-        entries_1.push(currentEntry_1);
-        return entries_1;
+        entries.push(currentEntry);
+        return entries;
     }
     catch (error) {
         alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.\nSee the "About" page for more details.');
@@ -118,14 +237,14 @@ function getLogEntries(input) {
     }
 }
 function autoSizeAll(skipHeader) {
-    var allColumnIds = [];
-    gridOptions['columnApi'].getColumns().forEach(function (column) {
+    const allColumnIds = [];
+    gridOptions['columnApi'].getColumns().forEach((column) => {
         allColumnIds.push(column.getId());
     });
     gridOptions['columnApi'].autoSizeColumns(allColumnIds, skipHeader);
 }
 function setDarkLight(darkMode) {
-    var gridDiv = document.querySelector('#logsGrid');
+    const gridDiv = document.querySelector('#logsGrid');
     if (darkMode) {
         gridDiv.className = 'ag-theme-alpine-dark';
     }
@@ -133,7 +252,7 @@ function setDarkLight(darkMode) {
         gridDiv.className = 'ag-theme-alpine';
     }
 }
-var columnDefs = [
+const columnDefs = [
     {
         field: 'Order',
         filter: 'agNumberColumnFilter'
@@ -144,15 +263,19 @@ var columnDefs = [
     },
     {
         field: 'Level',
-        filter: 'agSetColumnFilter'
+        filter: LevelFilter
     },
     {
         field: 'Type',
-        filter: 'agSetColumnFilter'
+        filter: 'agTextColumnFilter'
+    },
+    {
+        field: 'EventId',
+        filter: 'agNumberColumnFilter'
     },
     {
         field: 'Scopes',
-        filter: 'agSetColumnFilter',
+        filter: 'agTextColumnFilter',
         cellRenderer: function (param) {
             return param.data.Scopes.join('<br>');
         }
@@ -167,7 +290,7 @@ var columnDefs = [
     }
 ];
 // let the grid know which columns and what data to use
-var gridOptions = {
+const gridOptions = {
     defaultColDef: {
         sortable: true,
         resizable: true,
@@ -180,13 +303,13 @@ var gridOptions = {
     rowData: []
 };
 // setup the grid after the page has finished loading
-document.addEventListener('DOMContentLoaded', function () {
-    var gridDiv = document.querySelector('#logsGrid');
+document.addEventListener('DOMContentLoaded', () => {
+    const gridDiv = document.querySelector('#logsGrid');
     new window['agGrid'].Grid(gridDiv, gridOptions);
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         setDarkLight(true);
     }
 });
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
     setDarkLight(e.matches);
 });

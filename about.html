@@ -39,8 +39,31 @@
 	<div id="container">
 		<div id="content">
 			<h1>About</h1>
-			<h2>Basics of .NET Logging</h2>
-			<h3>Configuration</h3>
+			<nav>
+				<h2>Contents</h2>
+				<ul>
+					<li><a href="#basics">Basics of .NET Logging</a></li>
+					<ul>
+						<li><a href="#configuration">Configuration</a></li>
+						<li><a href="#gettingLogger">Getting an ILogger&lt;T&gt;</a></li>
+						<li><a href="#writingLogs">Writing Logs</a></li>
+						<li><a href="#addingScopes">Adding Scopes</a></li>
+					</ul>
+					<li><a href="#logFormat">Log format</a></li>
+					<ul>
+						<li><a href="#timestamp">Timestamp</a></li>
+						<li><a href="#level">Level</a></li>
+						<li><a href="#type">Type</a></li>
+						<li><a href="#eventId">EventId</a></li>
+						<li><a href="#scopes">Scopes</a></li>
+						<li><a href="#message">Message</a></li>
+					</ul>
+					<li><a href="#examples">Examples</a></li>
+					<li><a href="#nonStandard">Non-standard formats</a></li>
+				</ul>
+			</nav>
+			<h2 id="basics">Basics of .NET Logging</h2>
+			<h3 id="configuration">Configuration</h3>
 			<p>
 				Logging in .NET is configured in your <code>Startup.cs</code> or <code>Program.cs</code> code like this:
 			</p>
@@ -59,7 +82,7 @@ builder.Services.AddLogging(loggingBuilder =>
 				If no <code>TimestampFormat</code> is specified, a timestamp will not be included in the logs and the
 				Timestamp field on LogParse.net will be blank.
 			</p>
-			<h3>Getting an ILogger&lt;T&gt;</h3>
+			<h3 id="gettingLogger">Getting an ILogger&lt;T&gt;</h3>
 			<p>
 				Within your code, you will generally interact with the logging framework through an
 				instance of <code>ILogger&lt;T&gt;</code>,
@@ -81,7 +104,7 @@ builder.Services.AddLogging(loggingBuilder =>
 				You can also use the service locator (anti)pattern to obtain one, although this is not a recommended
 				approach and should only be used when absolutely necessary.
 			</p>
-			<h3>Writing Logs</h3>
+			<h3 id="writingLogs">Writing Logs</h3>
 			<p>
 				The normal approach is to assign the injected <code>ILogger&lt;T&gt;</code> to a
 				<code>private readonly</code> variable,
@@ -92,7 +115,7 @@ builder.Services.AddLogging(loggingBuilder =>
 				<code>.LogDebug</code>, and so on, or you can use <code>.Log</code>, and specify the level in the
 				parameters.
 			</p>
-			<h3>Adding Scopes</h3>
+			<h3 id="addingScopes">Adding Scopes</h3>
 			<p>
 				Scopes are added to logs within a <code>using</code> statement with the <code>.BeginScope</code> method
 				on the <code>ILogger&lt;T&gt;</code>
@@ -111,19 +134,19 @@ using (_logger.BeginScope($"Scope 1"))
     } 
 } 
 			</code></pre>
-			<h2>Log format</h2>
+			<h2 id="logFormat">Log format</h2>
 			<p>
 				The final log format looks like this:
 			</p>
 			<pre><code class="language-plaintext">
-(Timestamp in whatever format you specify, optional)(level): (type)
+(Timestamp in whatever format you specify, optional)(level): (type)[(eventId)]
       => Scope 1 => Scope 2
       Message Line 1
       Message Line 2
 			</code></pre>
 			<ul>
 				<li>
-					<h3>
+					<h3 id="timestamp">
 						Timestamp
 					</h3>
 					<p>
@@ -133,7 +156,7 @@ using (_logger.BeginScope($"Scope 1"))
 					</p>
 				</li>
 				<li>
-					<h3>
+					<h3 id="level">
 						Level
 					</h3>
 					<p>
@@ -173,16 +196,25 @@ using (_logger.BeginScope($"Scope 1"))
 					</table>
 				</li>
 				<li>
-					<h3>
+					<h3 id="type">
 						Type
 					</h3>
 					<p>
-						<strong>type</strong> is the generic type provided to the <code>ILogger&lt;T&gt;</code> used to produce
+						<strong>type</strong> is the generic type provided to the <code>ILogger&lt;T&gt;</code> used to
+						produce
 						the log.
 					</p>
 				</li>
 				<li>
-					<h3>
+					<h3 id="eventId">
+						Event Id
+					</h3>
+					<p>
+
+					</p>
+				</li>
+				<li>
+					<h3 id="scopes">
 						Scopes
 					</h3>
 					<p>
@@ -193,7 +225,7 @@ using (_logger.BeginScope($"Scope 1"))
 					</p>
 				</li>
 				<li>
-					<h3>
+					<h3 id="message">
 						Message
 					</h3>
 					<p>
@@ -204,7 +236,7 @@ using (_logger.BeginScope($"Scope 1"))
 					</p>
 				</li>
 			</ul>
-			<h2>Examples</h2>
+			<h2 id="examples">Examples</h2>
 			<p>
 				So, the full log entry would look like this:
 			</p>
@@ -230,9 +262,9 @@ using (_logger.BeginScope($"Scope 1"))
 				In this mode, there is no way to tell where the last scope ends and the message text begins.
 			</p>
 			<p>
-				So, the entire text after the <strong>type</strong> is placed in the Message field.
+				So, the entire text after the <strong>[Event Id]</strong> is placed in the Message field.
 			</p>
-			<h2>Non-standard formats</h3>
+			<h2 id="nonStandard">Non-standard formats</h3>
 				<p>
 					If your logs are in a custom format, or you use a 3rd party logging solution like NLog, Serilog, or
 					log4net,

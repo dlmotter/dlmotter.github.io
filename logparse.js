@@ -191,12 +191,15 @@ function getLogEntries(input) {
         const headerRegex = /(.*)?(trce|dbug|warn|fail|crit|info): (.*)\[([0-9]+)\] ?(.*)/;
         let lines = input.split(/\r?\n/).filter(x => !/^\s*$/.test(x)).map(x => x.replace(/(\x1b)\[[0-9]+m/g, ''));
         let alertedSingleLine = false;
+        let scopesVisible = false;
+        let timestampVisible = false;
         let currentEntry = new Log();
         let entries = [];
         let currentIndex = 1;
         lines.forEach(line => {
             if (/^\s+=>/.test(line)) {
                 // Scope line
+                scopesVisible = true;
                 currentEntry.Scopes = line.split('=>').map(x => x.trim()).filter(Boolean);
             }
             else if (/^\s+/.test(line)) {
@@ -209,9 +212,13 @@ function getLogEntries(input) {
                     entries.push(currentEntry);
                 }
                 let parts = line.match(headerRegex);
+                let timestamp = getTimestamp(parts[1]);
+                if (!!timestamp) {
+                    timestampVisible = true;
+                }
                 currentEntry = new Log();
                 currentEntry.Order = currentIndex++;
-                currentEntry.Timestamp = getTimestamp(parts[1]);
+                currentEntry.Timestamp = timestamp;
                 currentEntry.Level = Level[parts[2]];
                 currentEntry.Type = parts[3];
                 currentEntry.EventId = parseInt(parts[4]);
@@ -229,6 +236,8 @@ function getLogEntries(input) {
         });
         // Last entry never gets pushed by the next header, so add it manually
         entries.push(currentEntry);
+        gridOptions['columnApi'].setColumnVisible('Scopes', scopesVisible);
+        gridOptions['columnApi'].setColumnVisible('Timestamp', timestampVisible);
         return entries;
     }
     catch (error) {

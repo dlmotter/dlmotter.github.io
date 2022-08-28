@@ -51,14 +51,19 @@
 					</ul>
 					<li><a href="#logFormat">Log format</a></li>
 					<ul>
+						<li><a href="#order">Order</a></li>
 						<li><a href="#timestamp">Timestamp</a></li>
 						<li><a href="#level">Level</a></li>
 						<li><a href="#type">Type</a></li>
-						<li><a href="#eventId">EventId</a></li>
+						<li><a href="#eventId">Event Id</a></li>
 						<li><a href="#scopes">Scopes</a></li>
 						<li><a href="#message">Message</a></li>
 					</ul>
 					<li><a href="#examples">Examples</a></li>
+					<ul>
+						<li><a href="#multiLine">Multi-Line</a></li>
+						<li><a href="#singleLine">Single Line</a></li>
+					</ul>
 					<li><a href="#nonStandard">Non-standard formats</a></li>
 				</ul>
 			</nav>
@@ -136,23 +141,37 @@ using (_logger.BeginScope($"Scope 1"))
 			</code></pre>
 			<h2 id="logFormat">Log format</h2>
 			<p>
-				The final log format looks like this:
+				The default final log format looks like this:
 			</p>
 			<pre><code class="language-plaintext">
-(Timestamp in whatever format you specify, optional)(level): (type)[(eventId)]
+(Timestamp in whatever format you specify, optional)(Level): (Type)[(Event Id)]
       => Scope 1 => Scope 2
       Message Line 1
       Message Line 2
 			</code></pre>
+			<p>
+				And these are the columns that LogParse.net has:
+			</p>
 			<ul>
+				<li>
+					<h3 id="order">
+						Order
+					</h3>
+					<p>
+						This is simply the order that the logs appear in.
+					</p>
+				</li>
 				<li>
 					<h3 id="timestamp">
 						Timestamp
 					</h3>
 					<p>
 						If no <code>TimestampFormat</code> is specified in the config, the log entry will simply start
-						with
-						<strong>level</strong>.
+						with the (Level), and LogParse.net will not show the <strong>Timestamp</strong> column.
+					</p>
+					<p>
+						If there is no timestamp, you can still sort on <strong>Order</strong> to figure out what order
+						the logs occurred, in. You just won't be able to see when exactly they occurred.
 					</p>
 				</li>
 				<li>
@@ -160,7 +179,10 @@ using (_logger.BeginScope($"Scope 1"))
 						Level
 					</h3>
 					<p>
-						The logs use a shorthand 4 character string corresponding to the full log level for brevity:
+						Logs use a shorthand 4 character string corresponding to the full log level for brevity.
+					</p>
+					<p>
+						In ascending order of severity, .NET log levels are:
 					</p>
 					<table>
 						<tr>
@@ -200,18 +222,77 @@ using (_logger.BeginScope($"Scope 1"))
 						Type
 					</h3>
 					<p>
-						<strong>type</strong> is the generic type provided to the <code>ILogger&lt;T&gt;</code> used to
+						This is the generic type provided to the <code>ILogger&lt;T&gt;</code> used to
 						produce
 						the log.
 					</p>
+					<p>
+						Filtering on <strong>Type</strong> allows you to narrow down where the logs are coming from to a
+						specific class, and you can also perform a "Starts With" or "Contains" filter to get results for
+						related classes. For
+						example, filtering </p>
+					<p>
+						<strong>Type</strong> Starts With "Microsoft.EntityFrameworkCore"
+					</p>
+					<p>
+						would return logs from any type within Entity Framework Core, such as:
+					</p>
+					<table>
+						<tr>
+							<td>Microsoft.EntityFrameworkCore.Infrastructure</td>
+						</tr>
+						<tr>
+							<td>Microsoft.EntityFrameworkCore.Query</td>
+						</tr>
+						<tr>
+							<td>Microsoft.EntityFrameworkCore.Database.Connection</td>
+						</tr>
+						<tr>
+							<td>Microsoft.EntityFrameworkCore.Database.Command</td>
+						</tr>
+					</table>
 				</li>
 				<li>
 					<h3 id="eventId">
 						Event Id
 					</h3>
 					<p>
-
+						Event Ids are used to uniquely identify certain events so that they can be tied together in
+						logs.
 					</p>
+					<p>
+						For example, these are just a few Event Ids that Entity Framework Core uses:
+					</p>
+					<table>
+						<tr>
+							<td>20000</td>
+							<td>=</td>
+							<td>Opening connection to database</td>
+						</tr>
+						<tr>
+							<td>20001</td>
+							<td>=</td>
+							<td>Opened connection to database</td>
+						</tr>
+						<tr>
+							<td>20100</td>
+							<td>=</td>
+							<td>Executing DbCommand</td>
+						</tr>
+						<tr>
+							<td>20101</td>
+							<td>=</td>
+							<td>Executed DbCommand</td>
+						</tr>
+					</table>
+					<p>
+						So, if you want to filter your logs to just times that Entity Framework Core executed a
+						DbCommand, you can filter the <strong>Event Id</strong> column to 20101.
+					</p>
+					<p>
+						You can also define your own Event Ids for certain events within your application.
+					</p>
+					<p>If a log does not have a specific Event Id tied to it, a default of <code>0</code> is used.</p>
 				</li>
 				<li>
 					<h3 id="scopes">
@@ -221,7 +302,9 @@ using (_logger.BeginScope($"Scope 1"))
 						Scopes are all added on the next line with a <code>=&gt; </code> preceding each one.
 					</p>
 					<p>
-						If a log does not have any scopes, this line will be omitted.
+						If a log does not have any scopes, this line will be omitted. If none of your logs have any
+						scopes, LogParse.net will not show the
+						<strong>Scopes</strong> column.
 					</p>
 				</li>
 				<li>
@@ -232,11 +315,12 @@ using (_logger.BeginScope($"Scope 1"))
 						Any number of message lines follow the scopes.
 					</p>
 					<p>
-						Lines are separated with the carriage return/new line characters: <code>\r\n</code>
+						Lines can be separated with the carriage return/new line characters: <code>\r\n</code>
 					</p>
 				</li>
 			</ul>
 			<h2 id="examples">Examples</h2>
+			<h3 id="multiLine">Multi-Line</h3>
 			<p>
 				So, the full log entry would look like this:
 			</p>
@@ -247,6 +331,7 @@ using (_logger.BeginScope($"Scope 1"))
       Lorem ipsum dolor sit amet, consectetur adipiscing elit.
       Proin malesuada, turpis dictum interdum egestas.
 			</code></pre>
+			<h3 id="singleLine">Single Line</h3>
 			<p>
 				You can also specify <code>options.SingleLine</code> when you configure logging to make every log entry
 				take
@@ -262,7 +347,8 @@ using (_logger.BeginScope($"Scope 1"))
 				In this mode, there is no way to tell where the last scope ends and the message text begins.
 			</p>
 			<p>
-				So, the entire text after the <strong>[Event Id]</strong> is placed in the Message field.
+				So, the entire text after the [Event Id] is placed in the <strong>Message</strong> column on
+				LogParse.net, and the <strong>Scopes</strong> column is hidden.
 			</p>
 			<h2 id="nonStandard">Non-standard formats</h3>
 				<p>

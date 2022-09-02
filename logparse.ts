@@ -225,36 +225,45 @@ function getLogEntries(input: string): Log[] {
             let alertedSingleLine = false;
             let scopesVisible = false;
             let timestampVisible = false;
+            let writeEntry = false;
 
             let currentEntry = new Log();
+            currentEntry.MessageLines = [];
+            currentEntry.Type = 'PARTIAL ENTRY - NO HEADER PRESENT!\nScopes may not be present.\nMessage may not be complete.';
             let entries: Log[] = [];
             let currentIndex = 1;
             lines.forEach(line => {
                   if (/^\s+=>/.test(line)) {
+                        writeEntry = true;
+
                         // Scope line
                         scopesVisible = true;
 
                         currentEntry.Scopes = line.split('=>').map(x => x.trim()).filter(Boolean);
                   }
                   else if (/^\s+/.test(line)) {
+                        writeEntry = true;
+
                         // Message line
                         currentEntry.MessageLines.push(line.trim());
                   }
                   else {
                         // Header line
-                        if (currentIndex > 1) {
+                        if (writeEntry) {
+                              currentEntry.Order = currentIndex++;
                               entries.push(currentEntry);
                         }
 
+                        writeEntry = true;
+
                         let parts = line.match(headerRegex);
-                        
+
                         let timestamp = getTimestamp(parts[1]);
                         if (!!timestamp) {
                               timestampVisible = true;
                         }
 
                         currentEntry = new Log();
-                        currentEntry.Order = currentIndex++;
                         currentEntry.Timestamp = timestamp;
                         currentEntry.Level = Level[parts[2]];
                         currentEntry.Type = parts[3];
@@ -322,7 +331,10 @@ const columnDefs = [
       },
       {
             field: 'Type',
-            filter: 'agTextColumnFilter'
+            filter: 'agTextColumnFilter',
+            cellRenderer: function (param) {
+                  return param.data.Type.split('\n').join('<br>')
+            }
       },
       {
             field: 'EventId',
@@ -356,7 +368,12 @@ const gridOptions = {
       enableCellTextSelection: true,
       ensureDomOrder: true,
       columnDefs: columnDefs,
-      rowData: []
+      rowData: [],
+      // getRowStyle: params => {
+      //       if (params.data.Level === undefined) {
+      //             return { background: 'yellow' };
+      //       }
+      // }
 };
 
 // setup the grid after the page has finished loading

@@ -52,28 +52,36 @@
 <body>
     <div class="container">
         <div class="header">
-            <div id="title">Log<span class="title-emph">Parse</span>.net</div>
-            <div id="description">
-                <div>
-                    <span class="wbr">Simply and easily process .NET</span>
-                    <span class="wbr">logs directly in-browser.</span>
-                </div>
-                <div>
-                    <span class="wbr">Just upload a file or paste in the</span>
-                    <span class="wbr">plain text and click "Process Text".</span>
-                </div>
-                <div>
-                    <span class="wbr">If you are processing a lot of logs,</span>
-                    <span class="wbr">uploading a file works best!</span>
-                </div>
-            </div>
-            <input id="file" type="file" onchange="parseFile()">
-            <div id="or">or</div>
-            <textarea id="rawText" placeholder="Paste logs here"></textarea>
-            <button id="rawTextButton" onclick="parseText()">Process Text</button>
+            <div class="title">Log<span class="title-emph">Parse</span>.net</div>
             <div id="links">
                 <a id="aboutLink" href="./about.html" target="_blank">About</a>
                 <a id="privacyLink" href="./privacy.html" target="_blank">Privacy</a>
+            </div>
+            <div id="content">
+                <p>
+                    If you are a .NET developer looking for an easy way to process logs, you have come to the right
+                    place. Perform filtering and sorting on all attributes of your logs,
+                    all in the comfort of your browser. No download or login required!
+                </p>
+                <p>
+                    We support logs written to the app debugging window, or to the console. As long as it is the
+                    standard .NET format we can parse it. And more formats are on the way!
+                </p>
+                <p>
+                    To get started, simply...
+                </p>
+                <div class="form-group file-area">
+                    <input type="file" id="file" name="file" required="required" onchange="parseFile()" />
+                    <div class="file-dummy">
+                        <div class="default">Select/drop a log file here...</div>
+                    </div>
+                </div>
+                <p>or</p>
+                <div class="raw-text-container">
+                    <textarea id="rawText" placeholder="Paste raw text here"></textarea>
+                    <div>and</div>
+                    <button id="rawTextButton" onclick="parseText()">Process Text</button>
+                </div>
             </div>
         </div>
         <div class="grid">

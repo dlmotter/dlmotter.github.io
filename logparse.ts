@@ -282,6 +282,8 @@ function getLogEntries(input: string): Log[] {
 
             return entries;
       } catch (error) {
+            clearFile();
+            clearText();
             alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.\nSee the "About" page for more details.');
             return [];
       }

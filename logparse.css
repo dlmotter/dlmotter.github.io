@@ -1,7 +1,5 @@
 html {
-    height: 100%;
     font-family: 'Nunito', 'Arial', sans-serif;
-
     color: #19647E;
     background-color: #E5E5E5;
 }
@@ -11,15 +9,14 @@ body {
     height: 100%;
 }
 
-button,
-input[type=file]::file-selector-button {
+button {
     background: #19647E;
     color: #FFF;
-    padding: 0.33rem 0.66rem;
+    padding: 0.5rem 1rem;
     border: 1px solid #124658;
     border-radius: 0.25rem;
     cursor: pointer;
-    transition: background .2s ease-in-out;
+    transition: background .3s ease-in-out;
 }
 
 button:hover,
@@ -39,18 +36,59 @@ a:visited {
 }
 
 .header {
-    height: 50px;
     display: flex;
+    flex-direction: column;
     padding: 1rem 1rem 0 1rem;
     align-items: center;
+}
+
+.header #links a {
+    margin-right: 1rem;
+}
+
+.header #links a:last-child {
+    margin-right: 0;
+}
+
+.header #content {
+    text-align: center;
+}
+
+.header .title {
+    font-size: 3rem;
 }
 
 .title-emph {
     font-weight: bold;
 }
 
+.description {
+    max-width: 630px;
+    width: calc(100% - 2rem);
+}
+
+.raw-text-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 65px;
+}
+
+.raw-text-container textarea {
+    resize: none;
+    flex-grow: 1;
+    height: 100%;
+    outline: none;
+    border-radius: 0.25rem;
+}
+
+.raw-text-container div {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
 .grid {
-    flex: 1;
+    height: calc(100vh - 2rem);
     padding: 1rem;
     --ag-line-height: 1.5rem;
 }
@@ -59,42 +97,71 @@ a:visited {
     height: 100%;
 }
 
-.header div {
-    margin: 0 1rem;
+/* ===================== FILE INPUT ===================== */
+.file-area {
+    width: 100%;
+    position: relative;
 }
 
-.header #title {
-    font-size: 3rem;
-}
-
-.header #description {
-    display: flex;
-    flex-direction: column;
-}
-
-#file {
-    width: 14rem;
-}
-
-#rawTextButton {
-    margin: 0 0 0 1rem;
-}
-
-#rawText {
+.file-area input[type=file] {
+    position: absolute;
+    width: 100%;
     height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    cursor: pointer;
 }
 
-#links {
-    margin-left: auto;
-    display: flex;
-    flex-direction: column;
+.file-area .file-dummy {
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.4);
+    border: 2px dashed rgba(25, 100, 126, 0.4);
+    border-radius: 0.25rem;
+    text-align: center;
+    transition: background 0.3s ease-in-out;
 }
 
+.file-area:hover .file-dummy {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.file-area input[type=file]:focus+.file-dummy {
+    outline: none;
+}
+
+.file-area input[type=file]:valid+.file-dummy {
+    background-color: rgba(25, 100, 126, 0.2);
+}
+
+/* ===================== FILE INPUT ===================== */
+
+/* ===================== AG GRID ===================== */
 .ag-row .ag-cell {
     display: flex;
     align-items: center;
 }
 
+.filter-container {
+    padding: 12px;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    height: 24px;
+}
+
+.filter-item-label {
+    order: 1;
+    margin-left: var(--ag-grid-size);
+}
+
+/* ===================== AG GRID ===================== */
+
+/* ===================== ALT PAGES ===================== */
 #container {
     display: flex;
     flex-direction: column;
@@ -118,71 +185,20 @@ a:visited {
     font-size: small;
 }
 
-.filter-container {
-    padding: 12px;
-}
-
-.filter-item {
-    display: flex;
-    align-items: center;
-    height: 24px;
-}
-
-.filter-item-label {
-    order: 1;
-    margin-left:var(--ag-grid-size);
-}
-
-@media screen and (max-width: 1536px) {
-
-    html,
-    body,
-    .container {
-        height: unset;
-    }
-
-    .header {
-        height: unset;
-        flex-direction: column;
-    }
-
-    .header #description {
-        margin: 1rem 0 0 0;
-        align-items: center;
-        text-align: center;
-    }
-
-    #file,
-    #rawText,
-    #rawTextButton,
-    #links {
-        margin: 1rem 0 0 0;
-    }
-
-    #links {
-        align-items: center;
-    }
-
-    .grid {
-        height: calc(100vh - 2rem);
-        flex: unset;
-    }
-}
-
-@media screen and (max-width: 500px) {
-    .header #description div {
-        margin-bottom: .5rem;
-    }
-
-    .wbr {
-        display: block;
-    }
-}
+/* ===================== ALT PAGES ===================== */
 
 @media (prefers-color-scheme: dark) {
     html {
         background-color: #071e26;
         color: #d1e0e5;
+    }
+
+    .file-area .file-dummy {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .file-area:hover .file-dummy {
+        background: rgba(255, 255, 255, 0.2);
     }
 
     a,

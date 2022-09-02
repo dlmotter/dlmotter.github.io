@@ -227,7 +227,7 @@ function getLogEntries(input) {
                 // This is a "single line" entry. Header and message are on same line.
                 if (!!parts[5]) {
                     if (!alertedSingleLine) {
-                        alert('Your logs are in "Single Line" mode.\nThere is no reliable way to separate scopes from the message, so they are both included in the Message field.\nSee the "About" page for more details.');
+                        alert('Your logs are in "Single Line" mode.\nThere is no reliable way to separate scopes from the message, so they are both included in the Message field.\nSee the "Help / About" page for more details.');
                         alertedSingleLine = true;
                     }
                     currentEntry.MessageLines.push(parts[5]);
@@ -243,7 +243,7 @@ function getLogEntries(input) {
     catch (error) {
         clearFile();
         clearText();
-        alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.\nSee the "About" page for more details.');
+        alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.\nSee the "Help / About" page for more details.');
         return [];
     }
 }

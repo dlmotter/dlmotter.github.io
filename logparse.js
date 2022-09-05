@@ -245,6 +245,7 @@ function getLogEntries(input) {
         entries.push(currentEntry);
         gridOptions['columnApi'].setColumnVisible('Scopes', scopesVisible);
         gridOptions['columnApi'].setColumnVisible('Timestamp', timestampVisible);
+        scrollToBottom();
         return entries;
     }
     catch (error) {
@@ -253,6 +254,13 @@ function getLogEntries(input) {
         alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.\nSee the "Help / About" page for more details.');
         return [];
     }
+}
+function scrollToBottom() {
+    window.scroll({
+        top: document.body.scrollHeight,
+        left: 0,
+        behavior: 'smooth'
+    });
 }
 function autoSizeAll(skipHeader) {
     const allColumnIds = [];

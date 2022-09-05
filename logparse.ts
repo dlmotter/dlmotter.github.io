@@ -284,6 +284,7 @@ function getLogEntries(input: string): Log[] {
             });
 
             // Last entry never gets pushed by the next header, so add it manually
+            currentEntry.Order = currentIndex++;
             entries.push(currentEntry);
 
             gridOptions['columnApi'].setColumnVisible('Scopes', scopesVisible);

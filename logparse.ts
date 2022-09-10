@@ -219,8 +219,8 @@ function getTimestamp(timestampPart: string): Date {
 
 function getLogEntries(input: string): Log[] {
       try {
-            const headerRegex = /(.*)?(trce|dbug|warn|fail|crit|info): (.*)\[([0-9]+)\] ?(.*)/;
-            let lines = input.split(/\r?\n/).filter(x => !/^\s*$/.test(x)).map(x => x.replace(/(\x1b)\[[0-9]+m/g, ''));
+            const headerRegex = /(.*)??((?:\x1b\[[0-9]+m)*(?:trce|dbug|warn|fail|crit|info)(?:\x1b\[[0-9]+m)*): (.*)\[([0-9]+)\] ?(.*)/;
+            let lines = input.split(/\r?\n/).filter(x => !/^\s*$/.test(x));
 
             let alertedSingleLine = false;
             let scopesVisible = false;
@@ -258,27 +258,29 @@ function getLogEntries(input: string): Log[] {
 
                         let parts = line.match(headerRegex);
 
-                        let timestamp = getTimestamp(parts[1]);
-                        if (!!timestamp) {
-                              timestampVisible = true;
-                        }
-
-                        currentEntry = new Log();
-                        currentEntry.Timestamp = timestamp;
-                        currentEntry.Level = Level[parts[2]];
-                        currentEntry.Type = parts[3];
-                        currentEntry.EventId = parseInt(parts[4]);
-                        currentEntry.MessageLines = [];
-                        currentEntry.Scopes = [];
-
-                        // This is a "single line" entry. Header and message are on same line.
-                        if (!!parts[5]) {
-                              if (!alertedSingleLine) {
-                                    alert('Your logs are in "Single Line" mode.\nThere is no reliable way to separate scopes from the message, so they are both included in the Message field.\nSee the "Help / About" page for more details.');
-                                    alertedSingleLine = true;
+                        if (parts !== null) {
+                              let timestamp = getTimestamp(parts[1]);
+                              if (!!timestamp) {
+                                    timestampVisible = true;
                               }
 
-                              currentEntry.MessageLines.push(parts[5]);
+                              currentEntry = new Log();
+                              currentEntry.Timestamp = timestamp;
+                              currentEntry.Level = Level[parts[2].replace(/\x1b\[[0-9]+m/g, '')];
+                              currentEntry.Type = parts[3];
+                              currentEntry.EventId = parseInt(parts[4]);
+                              currentEntry.MessageLines = [];
+                              currentEntry.Scopes = [];
+
+                              // This is a "single line" entry. Header and message are on same line.
+                              if (!!parts[5]) {
+                                    if (!alertedSingleLine) {
+                                          alert('Your logs are in "Single Line" mode.\nThere is no reliable way to separate scopes from the message, so they are both included in the Message field.\nSee the "Help / About" page for more details.');
+                                          alertedSingleLine = true;
+                                    }
+
+                                    currentEntry.MessageLines.push(parts[5]);
+                              }
                         }
                   }
             });
@@ -326,6 +328,52 @@ function setDarkLight(darkMode: boolean) {
       }
 }
 
+const foreMap = {
+      '\x1b\\[1m\x1b\\[31m': 'rgb(231,72,86)', // Red
+      '\x1b\\[1m\x1b\\[32m': 'rgb(22, 198, 12)', // Green
+      '\x1b\\[1m\x1b\\[33m': 'rgb(249, 241, 165)', // Yellow
+      '\x1b\\[1m\x1b\\[34m': 'rgb(59, 120, 255)', // Blue
+      '\x1b\\[1m\x1b\\[35m': 'rgb(180, 0, 158)', // Magenta
+      '\x1b\\[1m\x1b\\[36m': 'rgb(97, 214, 214)', // Cyan
+      '\x1b\\[1m\x1b\\[37m': 'rgb(242, 242, 242)', // White
+      '\x1b\\[30m': 'rgb(12, 12, 12)', // Black
+      '\x1b\\[31m': 'rgb(197, 15, 31)', // Dark Red
+      '\x1b\\[32m': 'rgb(19, 161, 14)', // Dark Green
+      '\x1b\\[33m': 'rgb(193, 156, 0)', //Dark Yellow
+      '\x1b\\[34m': 'rgb(0, 55, 218)', // Dark Blue
+      '\x1b\\[35m': 'rgb(136, 23, 152)', // Dark Magenta
+      '\x1b\\[36m': 'rgb(58, 1150, 221)', // Dark Cyan
+      '\x1b\\[37m': 'rgb(118, 118, 118)' // Gray
+};
+
+const backMap = {
+      '\x1b\\[40m': 'rgb(12, 12, 12)', // Black
+      '\x1b\\[41m': 'rgb(197, 15, 31)', // Dark Red
+      '\x1b\\[42m': 'rgb(19, 161, 14)', // Dark Green
+      '\x1b\\[43m': 'rgb(193, 156, 0)', //Dark Yellow
+      '\x1b\\[44m': 'rgb(0, 55, 218)', // Dark Blue
+      '\x1b\\[45m': 'rgb(136, 23, 152)', // Dark Magenta
+      '\x1b\\[46m': 'rgb(58, 1150, 221)', // Dark Cyan
+      '\x1b\\[47m': 'rgb(118, 118, 118)' // Gray
+}
+
+function replaceColorCodes(input: string) {
+      if (!input) return '';
+
+      Object.entries(foreMap).forEach(([regex, color]) => {
+            input = input.replace(new RegExp(regex, 'g'), `<span style="color:${color}">`);
+      });
+
+      Object.entries(backMap).forEach(([regex, color]) => {
+            input = input.replace(new RegExp(regex, 'g'), `<span style="background-color:${color}">`);
+      });
+
+      input = input.replace(/(\x1B\[39m\x1B\[22m)/g, '</span>');
+      input = input.replace(/\x1b\[49m/g, '</span>');
+
+      return input;
+}
+
 const columnDefs = [
       {
             field: 'Order',
@@ -362,7 +410,7 @@ const columnDefs = [
             headerName: 'Message',
             filter: 'agTextColumnFilter',
             cellRenderer: function (param) {
-                  return param.data.MessageLines.join('<br>');
+                  return replaceColorCodes(param.data.MessageLines.join('<br>'));
             }
       }
 ];

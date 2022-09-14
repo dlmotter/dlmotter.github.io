@@ -231,23 +231,18 @@ function getLogEntries(input: string): Log[] {
 
             let currentEntry = new Log();
             currentEntry.MessageLines = [];
-            currentEntry.Type = 'PARTIAL ENTRY - NO HEADER PRESENT!\nScopes may not be present.\nMessage may not be complete.';
             let entries: Log[] = [];
             let currentIndex = 1;
 
             for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
                   let line = lines[lineIdx];
-                  if (/^\s+=>/.test(line)) {
-                        writeEntry = true;
 
+                  if (writeEntry && /^\s+=>/.test(line)) {
                         // Scope line
                         scopesVisible = true;
-
                         currentEntry.Scopes = line.split('=>').map(x => x.trim()).filter(Boolean);
                   }
-                  else if (/^\s+/.test(line)) {
-                        writeEntry = true;
-
+                  else if (writeEntry && /^\s+/.test(line)) {
                         // Message line
                         currentEntry.MessageLines.push(line.trim());
                   }
@@ -286,22 +281,23 @@ function getLogEntries(input: string): Log[] {
 
                                     currentEntry.MessageLines.push(parts[5]);
                               }
-                        } else if (currentIndex == 1) {
-                              // We can't read this line without ever getting a real entry.
-                              // Probably the wrong format.
-                              throw "Invalid format";
-                        }
-                        else {
-                              // We can't read this line, but we already have some real entries, so just skip it.
-                              // Probably a partial copy/paste, or there is some trailing text.
+                        } else {
+                              // Can't read this line. Skip it.
                               continue;
                         }
                   }
             }
 
-            // Last entry never gets pushed by the next header, so add it manually
-            currentEntry.Order = currentIndex++;
-            entries.push(currentEntry);
+            if (writeEntry) {
+                  // Last entry never gets pushed by the next header, so add it manually
+                  currentEntry.Order = currentIndex++;
+                  entries.push(currentEntry);
+            }
+
+            if (currentIndex == 1) {
+                  // We never got any entries, so it was a bad format.
+                  throw "Invalid format";
+            }
 
             gridOptions['columnApi'].setColumnVisible('Scopes', scopesVisible);
             gridOptions['columnApi'].setColumnVisible('Timestamp', timestampVisible);
@@ -312,7 +308,6 @@ function getLogEntries(input: string): Log[] {
             clearFile();
             clearText();
             openCloseModal('helpModal', true);
-            //alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.\nSee the "Help / About" page for more details.');
             return [];
       }
 }

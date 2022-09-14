@@ -214,14 +214,14 @@ function getLogEntries(input) {
                 currentEntry.MessageLines.push(line.trim());
             }
             else {
-                // Header line
-                if (writeEntry) {
-                    currentEntry.Order = currentIndex++;
-                    entries.push(currentEntry);
-                }
-                writeEntry = true;
                 let parts = line.match(headerRegex);
                 if (parts !== null) {
+                    // Header line
+                    if (writeEntry) {
+                        currentEntry.Order = currentIndex++;
+                        entries.push(currentEntry);
+                    }
+                    writeEntry = true;
                     let timestamp = getTimestamp(parts[1]);
                     if (!!timestamp) {
                         timestampVisible = true;

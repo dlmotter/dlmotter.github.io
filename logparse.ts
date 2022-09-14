@@ -234,7 +234,9 @@ function getLogEntries(input: string): Log[] {
             currentEntry.Type = 'PARTIAL ENTRY - NO HEADER PRESENT!\nScopes may not be present.\nMessage may not be complete.';
             let entries: Log[] = [];
             let currentIndex = 1;
-            lines.forEach((line, lineIdx) => {
+
+            for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+                  let line = lines[lineIdx];
                   if (/^\s+=>/.test(line)) {
                         writeEntry = true;
 
@@ -284,11 +286,18 @@ function getLogEntries(input: string): Log[] {
 
                                     currentEntry.MessageLines.push(parts[5]);
                               }
-                        } else if (currentIndex == 1 || lineIdx + 1 !== lines.length) {
+                        } else if (currentIndex == 1) {
+                              // We can't read this line without ever getting a real entry.
+                              // Probably the wrong format.
                               throw "Invalid format";
                         }
+                        else {
+                              // We can't read this line, but we already have some real entries, so just skip it.
+                              // Probably a partial copy/paste, or there is some trailing text.
+                              continue;
+                        }
                   }
-            });
+            }
 
             // Last entry never gets pushed by the next header, so add it manually
             currentEntry.Order = currentIndex++;

@@ -340,7 +340,21 @@ const columnDefs = [
     },
     {
         field: 'Timestamp',
-        filter: 'agDateColumnFilter'
+        filter: 'agDateColumnFilter',
+        filterParams: {
+            inRangeInclusive: true,
+            comparator: (filterValue, cellValue) => {
+                let cellNoTime = new Date(cellValue);
+                cellNoTime.setHours(0, 0, 0, 0);
+                if (cellNoTime < filterValue) {
+                    return -1;
+                }
+                else if (cellNoTime > filterValue) {
+                    return 1;
+                }
+                return 0;
+            }
+        }
     },
     {
         field: 'Level',

@@ -146,6 +146,7 @@ function parseFile() {
         fileReader.onload = function (fileLoadedEvent) {
             let fileText = fileLoadedEvent.target.result;
             let rowData = getLogEntries(fileText);
+            gridOptions['api'].setFilterModel(null);
             gridOptions['api'].setRowData(rowData);
             autoSizeAll(false);
             clearText();
@@ -165,6 +166,7 @@ function parseText() {
     let textAreaElement = document.getElementById('rawText');
     if (!!textAreaElement.value.trim()) {
         let rowData = getLogEntries(textAreaElement.value);
+        gridOptions['api'].setFilterModel(null);
         gridOptions['api'].setRowData(rowData);
         autoSizeAll(false);
         clearText();

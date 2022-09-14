@@ -232,7 +232,7 @@ function getLogEntries(input: string): Log[] {
             currentEntry.Type = 'PARTIAL ENTRY - NO HEADER PRESENT!\nScopes may not be present.\nMessage may not be complete.';
             let entries: Log[] = [];
             let currentIndex = 1;
-            lines.forEach(line => {
+            lines.forEach((line, lineIdx) => {
                   if (/^\s+=>/.test(line)) {
                         writeEntry = true;
 
@@ -281,6 +281,8 @@ function getLogEntries(input: string): Log[] {
 
                                     currentEntry.MessageLines.push(parts[5]);
                               }
+                        } else if (currentIndex == 1 || lineIdx + 1 !== lines.length) {
+                              throw "Invalid format";
                         }
                   }
             });
@@ -297,7 +299,8 @@ function getLogEntries(input: string): Log[] {
       } catch (error) {
             clearFile();
             clearText();
-            alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.\nSee the "Help / About" page for more details.');
+            openCloseModal('helpModal', true);
+            //alert('Could not parse your input.\nPlease make sure it is in the standard .NET format.\nSee the "Help / About" page for more details.');
             return [];
       }
 }
@@ -325,6 +328,14 @@ function setDarkLight(darkMode: boolean) {
             gridDiv.className = 'ag-theme-alpine-dark';
       } else {
             gridDiv.className = 'ag-theme-alpine';
+      }
+}
+
+function openCloseModal(id: string, open: boolean) {
+      let modal = document.getElementById(id) as HTMLDivElement;
+      if (!!modal) {
+            modal.style.display = open ? "block" : "none";
+            document.body.style.overflow = open ? "hidden" : "unset";
       }
 }
 
@@ -443,6 +454,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 });
 
+// Listen to dark mode/light mode changes
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
       setDarkLight(e.matches);
 });
+
+// Close modal when clicking outside
+window.onclick = function (event) {
+      if (event.target == document.getElementById('helpModal')) {
+            openCloseModal('helpModal', false)
+      }
+}

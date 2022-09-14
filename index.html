@@ -88,6 +88,26 @@
             <div id="logsGrid" class="ag-theme-alpine"></div>
         </div>
     </div>
+
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="openCloseModal('helpModal', false)">&times;</span>
+                <h2>Could not parse your input!</h2>
+            </div>
+            <div class="modal-body">
+                <p>We only support logs in the native .NET format like this:</p>
+                <pre><code>dbug: MyProgram[0]
+      => Scope 1 => Scope 2
+      Lorem ipsum dolor sit amet.
+      Proin malesuada, turpis dictum.</code></pre>
+                <p>These can be copy/pasted from the app debug window (if running code locally),<br>
+                    from the Docker console (if running code in a Docker container),<br>
+                    from server logs, or uploaded in a file if the logs have been exported.</p>
+                <p>See the <a href="./about.html#logFormat" target="_blank">Help / About</a> page for more details.</p>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

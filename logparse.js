@@ -297,46 +297,53 @@ function openCloseModal(id, open) {
         document.body.style.overflow = open ? "hidden" : "unset";
     }
 }
+/*
 const foreMap = {
-    '\x1b\\[1m\x1b\\[31m': 'rgb(231,72,86)',
-    '\x1b\\[1m\x1b\\[32m': 'rgb(22, 198, 12)',
-    '\x1b\\[1m\x1b\\[33m': 'rgb(249, 241, 165)',
-    '\x1b\\[1m\x1b\\[34m': 'rgb(59, 120, 255)',
-    '\x1b\\[1m\x1b\\[35m': 'rgb(180, 0, 158)',
-    '\x1b\\[1m\x1b\\[36m': 'rgb(97, 214, 214)',
-    '\x1b\\[1m\x1b\\[37m': 'rgb(242, 242, 242)',
-    '\x1b\\[30m': 'rgb(12, 12, 12)',
-    '\x1b\\[31m': 'rgb(197, 15, 31)',
-    '\x1b\\[32m': 'rgb(19, 161, 14)',
-    '\x1b\\[33m': 'rgb(193, 156, 0)',
-    '\x1b\\[34m': 'rgb(0, 55, 218)',
-    '\x1b\\[35m': 'rgb(136, 23, 152)',
-    '\x1b\\[36m': 'rgb(58, 1150, 221)',
-    '\x1b\\[37m': 'rgb(118, 118, 118)' // Gray
+      '\x1b\\[1m\x1b\\[31m': 'rgb(231,72,86)', // Red
+      '\x1b\\[1m\x1b\\[32m': 'rgb(22, 198, 12)', // Green
+      '\x1b\\[1m\x1b\\[33m': 'rgb(249, 241, 165)', // Yellow
+      '\x1b\\[1m\x1b\\[34m': 'rgb(59, 120, 255)', // Blue
+      '\x1b\\[1m\x1b\\[35m': 'rgb(180, 0, 158)', // Magenta
+      '\x1b\\[1m\x1b\\[36m': 'rgb(97, 214, 214)', // Cyan
+      '\x1b\\[1m\x1b\\[37m': 'rgb(242, 242, 242)', // White
+      '\x1b\\[30m': 'rgb(12, 12, 12)', // Black
+      '\x1b\\[31m': 'rgb(197, 15, 31)', // Dark Red
+      '\x1b\\[32m': 'rgb(19, 161, 14)', // Dark Green
+      '\x1b\\[33m': 'rgb(193, 156, 0)', //Dark Yellow
+      '\x1b\\[34m': 'rgb(0, 55, 218)', // Dark Blue
+      '\x1b\\[35m': 'rgb(136, 23, 152)', // Dark Magenta
+      '\x1b\\[36m': 'rgb(58, 1150, 221)', // Dark Cyan
+      '\x1b\\[37m': 'rgb(118, 118, 118)' // Gray
 };
+
 const backMap = {
-    '\x1b\\[40m': 'rgb(12, 12, 12)',
-    '\x1b\\[41m': 'rgb(197, 15, 31)',
-    '\x1b\\[42m': 'rgb(19, 161, 14)',
-    '\x1b\\[43m': 'rgb(193, 156, 0)',
-    '\x1b\\[44m': 'rgb(0, 55, 218)',
-    '\x1b\\[45m': 'rgb(136, 23, 152)',
-    '\x1b\\[46m': 'rgb(58, 1150, 221)',
-    '\x1b\\[47m': 'rgb(118, 118, 118)' // Gray
-};
-function replaceColorCodes(input) {
-    if (!input)
-        return '';
-    Object.entries(foreMap).forEach(([regex, color]) => {
-        input = input.replace(new RegExp(regex, 'g'), `<span style="color:${color}">`);
-    });
-    Object.entries(backMap).forEach(([regex, color]) => {
-        input = input.replace(new RegExp(regex, 'g'), `<span style="background-color:${color}">`);
-    });
-    input = input.replace(/(\x1B\[39m\x1B\[22m)/g, '</span>');
-    input = input.replace(/\x1b\[49m/g, '</span>');
-    return input;
+      '\x1b\\[40m': 'rgb(12, 12, 12)', // Black
+      '\x1b\\[41m': 'rgb(197, 15, 31)', // Dark Red
+      '\x1b\\[42m': 'rgb(19, 161, 14)', // Dark Green
+      '\x1b\\[43m': 'rgb(193, 156, 0)', //Dark Yellow
+      '\x1b\\[44m': 'rgb(0, 55, 218)', // Dark Blue
+      '\x1b\\[45m': 'rgb(136, 23, 152)', // Dark Magenta
+      '\x1b\\[46m': 'rgb(58, 1150, 221)', // Dark Cyan
+      '\x1b\\[47m': 'rgb(118, 118, 118)' // Gray
 }
+
+function replaceColorCodes(input: string) {
+      if (!input) return '';
+
+      Object.entries(foreMap).forEach(([regex, color]) => {
+            input = input.replace(new RegExp(regex, 'g'), `<span style="color:${color}">`);
+      });
+
+      Object.entries(backMap).forEach(([regex, color]) => {
+            input = input.replace(new RegExp(regex, 'g'), `<span style="background-color:${color}">`);
+      });
+
+      input = input.replace(/(\x1B\[39m\x1B\[22m)/g, '</span>');
+      input = input.replace(/\x1b\[49m/g, '</span>');
+
+      return input;
+}
+*/
 const columnDefs = [
     {
         field: 'Order',
@@ -387,7 +394,8 @@ const columnDefs = [
         headerName: 'Message',
         filter: 'agTextColumnFilter',
         cellRenderer: function (param) {
-            return replaceColorCodes(param.data.MessageLines.join('<br>'));
+            return param.data.MessageLines.join('<br>');
+            //return replaceColorCodes(param.data.MessageLines.join('<br>'));
         }
     }
 ];

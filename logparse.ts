@@ -347,6 +347,7 @@ function openCloseModal(id: string, open: boolean) {
       }
 }
 
+/*
 const foreMap = {
       '\x1b\\[1m\x1b\\[31m': 'rgb(231,72,86)', // Red
       '\x1b\\[1m\x1b\\[32m': 'rgb(22, 198, 12)', // Green
@@ -392,6 +393,7 @@ function replaceColorCodes(input: string) {
 
       return input;
 }
+*/
 
 const columnDefs = [
       {
@@ -442,7 +444,8 @@ const columnDefs = [
             headerName: 'Message',
             filter: 'agTextColumnFilter',
             cellRenderer: function (param) {
-                  return replaceColorCodes(param.data.MessageLines.join('<br>'));
+                  return param.data.MessageLines.join('<br>');
+                  //return replaceColorCodes(param.data.MessageLines.join('<br>'));
             }
       }
 ];

@@ -227,7 +227,7 @@ function getLogEntries(input: string): Log[] {
             let alertedSingleLine = false;
             let scopesVisible = false;
             let timestampVisible = false;
-            let writeEntry = false;
+            let hasEntry = false;
 
             let currentEntry = new Log();
             currentEntry.MessageLines = [];
@@ -237,27 +237,31 @@ function getLogEntries(input: string): Log[] {
             for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
                   let line = lines[lineIdx];
 
-                  if (writeEntry && /^\s+=>/.test(line)) {
-                        // Scope line
-                        scopesVisible = true;
-                        currentEntry.Scopes = line.split('=>').map(x => x.trim()).filter(Boolean);
+                  // Scope line
+                  if (/^\s+=>/.test(line)) {
+                        if (hasEntry) {
+                              scopesVisible = true;
+                              currentEntry.Scopes = line.split('=>').map(x => x.trim()).filter(Boolean);
+                        }
+
                   }
-                  else if (writeEntry && /^\s+/.test(line)) {
-                        // Message line
-                        currentEntry.MessageLines.push(line.trim());
+                  // Message line
+                  else if (/^\s+/.test(line)) {
+                        if (hasEntry) {
+                              currentEntry.MessageLines.push(line.trim());
+                        }
                   }
+                  // Header line
                   else {
                         let parts = line.match(headerRegex);
 
                         if (parts !== null) {
-
-                              // Header line
-                              if (writeEntry) {
+                              if (hasEntry) {
                                     currentEntry.Order = currentIndex++;
                                     entries.push(currentEntry);
                               }
 
-                              writeEntry = true;
+                              hasEntry = true;
 
                               let timestamp = getTimestamp(parts[1]);
                               if (!!timestamp) {
@@ -281,21 +285,18 @@ function getLogEntries(input: string): Log[] {
 
                                     currentEntry.MessageLines.push(parts[5]);
                               }
-                        } else {
-                              // Can't read this line. Skip it.
-                              continue;
                         }
                   }
             }
 
-            if (writeEntry) {
-                  // Last entry never gets pushed by the next header, so add it manually
+            // Last entry never gets pushed by the next header, so add it manually
+            if (hasEntry) {
                   currentEntry.Order = currentIndex++;
                   entries.push(currentEntry);
             }
 
+            // We never got any entries, so it was a bad format.
             if (currentIndex == 1) {
-                  // We never got any entries, so it was a bad format.
                   throw "Invalid format";
             }
 

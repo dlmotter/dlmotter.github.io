@@ -347,53 +347,220 @@ function openCloseModal(id: string, open: boolean) {
       }
 }
 
-/*
-const foreMap = {
-      '\x1b\\[1m\x1b\\[31m': 'rgb(231,72,86)', // Red
-      '\x1b\\[1m\x1b\\[32m': 'rgb(22, 198, 12)', // Green
-      '\x1b\\[1m\x1b\\[33m': 'rgb(249, 241, 165)', // Yellow
-      '\x1b\\[1m\x1b\\[34m': 'rgb(59, 120, 255)', // Blue
-      '\x1b\\[1m\x1b\\[35m': 'rgb(180, 0, 158)', // Magenta
-      '\x1b\\[1m\x1b\\[36m': 'rgb(97, 214, 214)', // Cyan
-      '\x1b\\[1m\x1b\\[37m': 'rgb(242, 242, 242)', // White
-      '\x1b\\[30m': 'rgb(12, 12, 12)', // Black
-      '\x1b\\[31m': 'rgb(197, 15, 31)', // Dark Red
-      '\x1b\\[32m': 'rgb(19, 161, 14)', // Dark Green
-      '\x1b\\[33m': 'rgb(193, 156, 0)', //Dark Yellow
-      '\x1b\\[34m': 'rgb(0, 55, 218)', // Dark Blue
-      '\x1b\\[35m': 'rgb(136, 23, 152)', // Dark Magenta
-      '\x1b\\[36m': 'rgb(58, 1150, 221)', // Dark Cyan
-      '\x1b\\[37m': 'rgb(118, 118, 118)' // Gray
-};
+const normalTerminalValues = [0, 1, 22, 4, 24, /*7, 27, */30, 31, 32, 33, 34, 35, 36, 37, /*38, */39, 40, 41, 42, 43, 44, 45, 46, 47, /*48, */49, 90, 91, 92, 93, 94, 95, 96, 97, 100, 101, 102, 103, 104, 105, 106, 107];
 
-const backMap = {
-      '\x1b\\[40m': 'rgb(12, 12, 12)', // Black
-      '\x1b\\[41m': 'rgb(197, 15, 31)', // Dark Red
-      '\x1b\\[42m': 'rgb(19, 161, 14)', // Dark Green
-      '\x1b\\[43m': 'rgb(193, 156, 0)', //Dark Yellow
-      '\x1b\\[44m': 'rgb(0, 55, 218)', // Dark Blue
-      '\x1b\\[45m': 'rgb(136, 23, 152)', // Dark Magenta
-      '\x1b\\[46m': 'rgb(58, 1150, 221)', // Dark Cyan
-      '\x1b\\[47m': 'rgb(118, 118, 118)' // Gray
+function formatString(input: string) {
+      let fore: string = null;
+      let back: string = null;
+      let underline: boolean = false;
+      let bright: boolean = false;
+
+      let inTerminalSequence: boolean = false;
+
+      let output = '<span>';
+      for (let inputIdx: number = 0; inputIdx < input.length; inputIdx++) {
+            if (input[inputIdx] === '\x1b' && input[inputIdx + 1] === '[') {
+                  let codeStr: string = '';
+                  let codeIdx: number = 1;
+                  while (!isNaN(+input[inputIdx + 1 + codeIdx]) || input[inputIdx + 1 + codeIdx] === ';') {
+                        codeStr += input[inputIdx + 1 + codeIdx];
+                        codeIdx++;
+                  }
+                  let parts = codeStr.split(';').map(x => Number.parseInt(x)).filter(x => !isNaN(x));
+                  if (
+                        input[inputIdx + 1 + codeIdx] === 'm' &&
+                        (parts.length === 1 && normalTerminalValues.includes(parts[0])) ||
+                        (parts.length === 5 && parts[0] === 38 && parts[1] === 2) ||
+                        (parts.length === 5 && parts[0] === 48 && parts[1] === 2) ||
+                        (parts.length === 3 && parts[0] === 38 && parts[1] === 5) ||
+                        (parts.length === 3 && parts[0] === 48 && parts[1] === 5)
+                  ) {
+                        switch (parts[0]) {
+                              // Reset
+                              case 0:
+                                    fore = null;
+                                    back = null;
+                                    underline = false;
+                                    break;
+                              // Bold/bright modifiers
+                              case 1:
+                                    bright = true;
+                                    break;
+                              case 22:
+                                    bright = false;
+                                    break;
+                              // Underline modifiers
+                              case 4:
+                                    underline = true;
+                                    break;
+                              case 24:
+                                    underline = false;
+                                    break;
+                              // Foreground colors
+                              case 30:
+                                    fore = (bright ? 'bright-' : '') + 'black';
+                                    break;
+                              case 31:
+                                    fore = (bright ? 'bright-' : '') + 'red';
+                                    break;
+                              case 32:
+                                    fore = (bright ? 'bright-' : '') + 'green';
+                                    break;
+                              case 33:
+                                    fore = (bright ? 'bright-' : '') + 'yellow';
+                                    break;
+                              case 34:
+                                    fore = (bright ? 'bright-' : '') + 'blue';
+                                    break;
+                              case 35:
+                                    fore = (bright ? 'bright-' : '') + 'magenta';
+                                    break;
+                              case 36:
+                                    fore = (bright ? 'bright-' : '') + 'cyan';
+                                    break;
+                              case 37:
+                                    fore = (bright ? 'bright-' : '') + 'white';
+                                    break;
+                              case 38:
+                                    if (parts[1] === 2) {
+                                          fore = `rgb(${parts[2]}, ${parts[3]}, ${parts[4]})`;
+                                    } else if (parts[1] === 5) {
+                                          fore = `xterm-${parts[2]}`;
+                                    }
+                                    break;
+                              case 39:
+                                    fore = null;
+                                    break;
+                              // Background colors
+                              case 40:
+                                    back = 'black';
+                                    break;
+                              case 41:
+                                    back = 'red';
+                                    break;
+                              case 42:
+                                    back = 'green';
+                                    break;
+                              case 43:
+                                    back = 'yellow';
+                                    break;
+                              case 44:
+                                    back = 'blue';
+                                    break;
+                              case 45:
+                                    back = 'magenta';
+                                    break;
+                              case 46:
+                                    back = 'cyan';
+                                    break;
+                              case 47:
+                                    back = 'white';
+                                    break;
+                              case 48:
+                                    if (parts[1] === 2) {
+                                          back = `rgb(${parts[2]}, ${parts[3]}, ${parts[4]})`;
+                                    } else if (parts[1] === 5) {
+                                          back = `xterm-${parts[2]}`;
+                                    }
+                                    break;
+                              case 49:
+                                    back = null;
+                                    break;
+                              // Bold/bright foreground colors
+                              case 90:
+                                    fore = 'bright-black';
+                                    break;
+                              case 91:
+                                    fore = 'bright-red';
+                                    break;
+                              case 92:
+                                    fore = 'bright-green';
+                                    break;
+                              case 93:
+                                    fore = 'bright-yellow';
+                                    break;
+                              case 94:
+                                    fore = 'bright-blue';
+                                    break;
+                              case 95:
+                                    fore = 'bright-magenta';
+                                    break;
+                              case 96:
+                                    fore = 'bright-cyan';
+                                    break;
+                              case 97:
+                                    fore = 'bright-white';
+                                    break;
+                              // Bold/bright background colors
+                              case 100:
+                                    back = 'bright-black';
+                                    break;
+                              case 101:
+                                    back = 'bright-red';
+                                    break;
+                              case 102:
+                                    back = 'bright-green';
+                                    break;
+                              case 103:
+                                    back = 'bright-yellow';
+                                    break;
+                              case 104:
+                                    back = 'bright-blue';
+                                    break;
+                              case 105:
+                                    back = 'bright-magenta';
+                                    break;
+                              case 106:
+                                    back = 'bright-cyan';
+                                    break;
+                              case 107:
+                                    back = 'bright-white';
+                                    break;
+                              default:
+                                    break;
+                        }
+
+                        inTerminalSequence = true;
+                        inputIdx = inputIdx + 1 + codeIdx;
+
+                        continue;
+                  }
+            }
+
+            // We just exited a terminal sequence. Close old span and open a new one.
+            if (inTerminalSequence) {
+                  let styleString = '';
+                  if (!!fore) {
+                        if (fore.startsWith('rgb(')) {
+                              styleString += `color: ${fore};`;
+                        } else {
+                              styleString += `color: var(--${fore});`;
+                        }
+                  }
+                  if (!!back) {
+                        if (back.startsWith('rgb(')) {
+                              styleString += `background-color: ${back};`;
+                        } else {
+                              styleString += `background-color: var(--${back});`;
+                        }
+                  }
+                  if (underline) {
+                        styleString += 'text-decoration: underline;'
+                  }
+
+                  if (styleString == '') {
+                        output += '</span><span>';
+                  } else {
+                        output += `</span><span style="${styleString}">`;
+                  }
+            }
+
+            inTerminalSequence = false;
+            output += input[inputIdx];
+      }
+
+      return output + '</span>';
 }
-
-function replaceColorCodes(input: string) {
-      if (!input) return '';
-
-      Object.entries(foreMap).forEach(([regex, color]) => {
-            input = input.replace(new RegExp(regex, 'g'), `<span style="color:${color}">`);
-      });
-
-      Object.entries(backMap).forEach(([regex, color]) => {
-            input = input.replace(new RegExp(regex, 'g'), `<span style="background-color:${color}">`);
-      });
-
-      input = input.replace(/(\x1B\[39m\x1B\[22m)/g, '</span>');
-      input = input.replace(/\x1b\[49m/g, '</span>');
-
-      return input;
-}
-*/
 
 const columnDefs = [
       {
@@ -444,8 +611,8 @@ const columnDefs = [
             headerName: 'Message',
             filter: 'agTextColumnFilter',
             cellRenderer: function (param) {
+                  //return formatString(param.data.MessageLines.join('<br>'));
                   return param.data.MessageLines.join('<br>');
-                  //return replaceColorCodes(param.data.MessageLines.join('<br>'));
             }
       }
 ];

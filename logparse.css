@@ -42,6 +42,11 @@ a:visited {
     align-items: center;
 }
 
+.header h1 {
+    font-weight: normal;
+    margin: 0;
+}
+
 .header #links a {
     margin-right: 1rem;
 }
@@ -145,6 +150,12 @@ a:visited {
 
 .modal-header {
     padding: 1rem 2rem;
+}
+
+.modal-header .modal-title {
+    display: block;
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
 .modal-body {

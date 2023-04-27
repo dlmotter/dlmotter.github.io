@@ -17,8 +17,8 @@
         crossorigin="anonymous"></script> -->
 
     <!-- SEO -->
-    <title>LogParse.net: Analyze .NET logs in-browser</title>
-    <meta property="og:title" content=">LogParse.net: Analyze .NET logs in-browser">
+    <title>Analyze .NET logs in-browser</title>
+    <meta property="og:title" content="Analyze .NET logs in-browser">
     <meta name="description"
         content="Simply and easily analyze .NET logs directly in the browser. No download or login required.">
     <meta property="og:description"
@@ -52,7 +52,9 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="title">Log<span class="title-emph">Parse</span>.net</div>
+            <h1>
+                <span class="title">Log<span class="title-emph">Parse</span>.net</span>
+            </h1>
             <div id="links">
                 <a id="aboutLink" href="./about.html" target="_blank">Help / About</a>
                 <a id="privacyLink" href="./privacy.html" target="_blank">Privacy Policy</a>
@@ -69,6 +71,14 @@
                 <p>
                     We support logs written to the console or a file. As long as it is in the
                     standard .NET <a href="./about.html#logFormat" target="_blank">format</a>, we can parse it.
+                </p>
+                <p>
+                    Just copy and paste your logs from your console window or log file, or upload the entire file.
+                    Any file extension is acceptable as long as it can be read as plain text and is in the proper format.
+                </p>
+                <p>
+                    If you have a lot of logs or are experiencing lag when copy and pasting, we recommend uploading the file
+                    as this will have better performance.
                 </p>
                 <p>
                     To get started, simply...
@@ -96,14 +106,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <span class="close" onclick="openCloseModal('helpModal', false)">&times;</span>
-                <h2>Could not parse your input!</h2>
+                <span class="modal-title">Could not parse your input!</span>
             </div>
             <div class="modal-body">
                 <p>We only support logs in the native .NET format, where a log entry looks like this:</p>
                 <pre><code>dbug: MyProgram[0]
       => Scope 1 => Scope 2
-      Lorem ipsum dolor sit amet.
-      Proin malesuada, turpis dictum.</code></pre>
+      This is the message of a log entry.
+      There can be multiple lines if the entry contains line breaks.</code></pre>
                 <p>You can upload a log file, or the raw text can be copy/pasted in from the app debug window, the
                     Docker console, the server's stdout, etc., depending on where your code is running.</p>
                 <p>See the <a href="./about.html#logFormat" target="_blank">Help / About</a> page for more details.</p>

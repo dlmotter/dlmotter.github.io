@@ -43,6 +43,11 @@
     <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/styles/ag-grid.css" />
     <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/styles/ag-theme-alpine.css" />
+    
+    <!-- highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
 
     <!-- local -->
     <link rel="stylesheet" href="./logparse.css" />
@@ -54,11 +59,11 @@
         <div class="header">
             <span class="title">Log<span class="title-emph">Parse</span>.net</span>
             <div id="links">
-                <a id="aboutLink" href="./about.html" target="_blank">Help / About</a>
+                <!-- <a id="aboutLink" href="./about.html" target="_blank">Help / About</a> -->
                 <a id="privacyLink" href="./privacy.html" target="_blank">Privacy Policy</a>
             </div>
             <div id="content">
-                <h1 class="header">Easily analyze your .NET logs</h1>
+                <h1 class="header">Analyze your .NET logs</h1>
                 <p>
                     If you are a .NET developer looking for an easy way to analyze logs, you have come to the right
                     place.
@@ -100,8 +105,313 @@
                 </div>
             </div>
         </div>
-        <div class="grid">
+        <div id="grid">
             <div id="logsGrid" class="ag-theme-alpine"></div>
+        </div>
+    </div>
+
+    <div id="container">
+        <div id="content">
+            <h2 id="basics">Basics of .NET Logging</h2>
+            <h3 id="configuration">Configuration</h3>
+            <p>
+                Logging in .NET is configured in your <code>Startup.cs</code> or <code>Program.cs</code> code like this:
+            </p>
+            <pre><code class="language-csharp">
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.AddSimpleConsole(options =>
+    {
+        options.IncludeScopes = true;
+        options.UseUtcTimestamp = true;
+        options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
+    });
+});
+            </code></pre>
+            <p>
+                If no <code>TimestampFormat</code> is specified, a timestamp will not be included in the logs and the
+                Timestamp field on LogParse.net will be blank.
+            </p>
+            <h3 id="gettingLogger">Getting an ILogger&lt;T&gt;</h3>
+            <p>
+                Within your code, you will generally interact with the logging framework through an
+                instance of <code>ILogger&lt;T&gt;</code>,
+                where <code>&lt;T&gt;</code> is a generic type parameter, and is usually the type of the class the
+                logger
+                is used in.
+            </p>
+            <p>
+                The preferred method of getting an <code>ILogger&lt;T&gt;</code> is through dependency injection.
+                Simply add one to your class parameters and it will be injected and ready for use.
+            </p>
+            <p>
+                In static classes, or other situations where DI doesn't work, you can use the
+                <a href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.loggerfactory?view=dotnet-plat-ext-6.0"
+                    target="_blank">LoggerFactory</a>
+                class.
+            </p>
+            <p>
+                You can also use the service locator (anti)pattern to obtain one, although this is not a recommended
+                approach and should only be used when absolutely necessary.
+            </p>
+            <h3 id="writingLogs">Writing Logs</h3>
+            <p>
+                The normal approach is to assign the injected <code>ILogger&lt;T&gt;</code> to a
+                <code>private readonly</code> variable,
+                usually named <code>_logger</code> or something similar.
+            </p>
+            <p>
+                Use <code>_logger</code> to write logs. You can use a method like <code>.LogTrace</code>,
+                <code>.LogDebug</code>, and so on, or you can use <code>.Log</code>, and specify the level in the
+                parameters.
+            </p>
+            <h3 id="addingScopes">Adding Scopes</h3>
+            <p>
+                Scopes are added to logs within a <code>using</code> statement with the <code>.BeginScope</code> method
+                on the <code>ILogger&lt;T&gt;</code>
+            </p>
+            <p>
+                Any log that is written at any level inside this scope will have the scope added to it, and multiple
+                scopes can be added to a log.
+            </p>
+            <pre><code class="language-csharp">
+using (_logger.BeginScope($"Scope 1"))
+{
+    using (_logger.BeginScope($"Scope 2"))
+    {
+        // This will be a multiline log at the "Debug" level, with "Scope 1" and "Scope 2" on it
+        _logger.LogDebug("This is the message of a log entry.\r\nThere can be multiple lines if the entry contains line breaks.");
+    } 
+} 
+            </code></pre>
+            <h2 id="logFormat">Log format</h2>
+            <p>
+                The default final log format looks like this:
+            </p>
+            <pre><code class="language-plaintext">
+(Timestamp in whatever format you specify, optional)(Level): (Type)[(Event Id)]
+        => Scope 1 => Scope 2
+        Message Line 1
+        Message Line 2
+            </code></pre>
+            <p>
+                And these are the columns that LogParse.net has:
+            </p>
+            <ul>
+                <li>
+                    <h3 id="order">
+                        Order
+                    </h3>
+                    <p>
+                        This is simply the order that the logs appear in.
+                    </p>
+                </li>
+                <li>
+                    <h3 id="timestamp">
+                        Timestamp
+                    </h3>
+                    <p>
+                        If no <code>TimestampFormat</code> is specified in the config, the log entry will simply start
+                        with the (Level), and LogParse.net will not show the <strong>Timestamp</strong> column.
+                    </p>
+                    <p>
+                        If there is no timestamp, you can still sort on <strong>Order</strong> to figure out what order
+                        the logs occurred, in. You just won't be able to see when exactly they occurred.
+                    </p>
+                </li>
+                <li>
+                    <h3 id="level">
+                        Level
+                    </h3>
+                    <p>
+                        Logs use a shorthand 4 character string corresponding to the full log level for brevity.
+                    </p>
+                    <p>
+                        In ascending order of severity, .NET log levels are:
+                    </p>
+                    <table>
+                        <tr>
+                            <td><code>trce</code></td>
+                            <td>=</td>
+                            <td>Trace</td>
+                        </tr>
+                        <tr>
+                            <td><code>dbug</code></td>
+                            <td>=</td>
+                            <td>Debug</td>
+                        </tr>
+                        <tr>
+                            <td><code>info</code></td>
+                            <td>=</td>
+                            <td>Information</td>
+                        </tr>
+                        <tr>
+                            <td><code>warn</code></td>
+                            <td>=</td>
+                            <td>Warning</td>
+                        </tr>
+                        <tr>
+                            <td><code>fail</code></td>
+                            <td>=</td>
+                            <td>Error</td>
+                        </tr>
+                        <tr>
+                            <td><code>crit</code></td>
+                            <td>=</td>
+                            <td>Critical</td>
+                        </tr>
+                    </table>
+                </li>
+                <li>
+                    <h3 id="type">
+                        Type
+                    </h3>
+                    <p>
+                        This is the generic type provided to the <code>ILogger&lt;T&gt;</code> used to
+                        produce
+                        the log.
+                    </p>
+                    <p>
+                        Filtering on <strong>Type</strong> allows you to narrow down where the logs are coming from to a
+                        specific class, and you can also perform a "Starts With" or "Contains" filter to get results for
+                        related classes. For
+                        example, filtering </p>
+                    <p>
+                        <strong>Type</strong> Starts With "Microsoft.EntityFrameworkCore"
+                    </p>
+                    <p>
+                        would return logs from any type within Entity Framework Core, such as:
+                    </p>
+                    <table>
+                        <tr>
+                            <td>Microsoft.EntityFrameworkCore.Infrastructure</td>
+                        </tr>
+                        <tr>
+                            <td>Microsoft.EntityFrameworkCore.Query</td>
+                        </tr>
+                        <tr>
+                            <td>Microsoft.EntityFrameworkCore.Database.Connection</td>
+                        </tr>
+                        <tr>
+                            <td>Microsoft.EntityFrameworkCore.Database.Command</td>
+                        </tr>
+                    </table>
+                </li>
+                <li>
+                    <h3 id="eventId">
+                        Event Id
+                    </h3>
+                    <p>
+                        Event Ids are used to uniquely identify certain events so that they can be tied together in
+                        logs.
+                    </p>
+                    <p>
+                        For example, these are just a few Event Ids that Entity Framework Core uses:
+                    </p>
+                    <table>
+                        <tr>
+                            <td>20000</td>
+                            <td>=</td>
+                            <td>Opening connection to database</td>
+                        </tr>
+                        <tr>
+                            <td>20001</td>
+                            <td>=</td>
+                            <td>Opened connection to database</td>
+                        </tr>
+                        <tr>
+                            <td>20100</td>
+                            <td>=</td>
+                            <td>Executing DbCommand</td>
+                        </tr>
+                        <tr>
+                            <td>20101</td>
+                            <td>=</td>
+                            <td>Executed DbCommand</td>
+                        </tr>
+                    </table>
+                    <p>
+                        So, if you want to filter your logs to just times that Entity Framework Core executed a
+                        DbCommand, you can filter the <strong>Event Id</strong> column to 20101.
+                    </p>
+                    <p>
+                        You can also define your own Event Ids for certain events within your application.
+                    </p>
+                    <p>If a log does not have a specific Event Id tied to it, a default of <code>0</code> is used.</p>
+                </li>
+                <li>
+                    <h3 id="scopes">
+                        Scopes
+                    </h3>
+                    <p>
+                        Scopes are all added on the next line with a <code>=&gt; </code> preceding each one.
+                    </p>
+                    <p>
+                        If a log does not have any scopes, this line will be omitted. If none of your logs have any
+                        scopes, LogParse.net will not show the
+                        <strong>Scopes</strong> column.
+                    </p>
+                </li>
+                <li>
+                    <h3 id="message">
+                        Message
+                    </h3>
+                    <p>
+                        Any number of message lines follow the scopes.
+                    </p>
+                    <p>
+                        Lines can be separated with the carriage return/new line characters: <code>\r\n</code>
+                    </p>
+                </li>
+            </ul>
+            <h2 id="examples">Examples</h2>
+            <h3 id="multiLine">Multi-Line</h3>
+            <p>
+                So, the full log entry would look like this:
+            </p>
+            <p class="small">Tip! Try copy/pasting this into the text box on the main page to see how it works.</p>
+            <pre><code class="language-plaintext">
+[2022-08-19 21:34:16.196] dbug: MyProgram[0]
+        => Scope 1 => Scope 2
+        This is the message of a log entry.
+        There can be multiple lines if the entry contains line breaks.
+            </code></pre>
+            <h3 id="singleLine">Single Line</h3>
+            <p>
+                You can also specify <code>options.SingleLine</code> when you configure logging to make every log entry
+                take
+                only one line.
+            </p>
+            <p>
+                That would look like this instead:
+            </p>
+            <pre><code class="language-plaintext">
+[2022-08-19 21:34:16.196] dbug: MyProgram[0] => Scope 1 => Scope 2 This is the message of a log entry.
+            </code></pre>
+            <p>
+                In this mode, there is no way to tell where the last scope ends and the message text begins.
+            </p>
+            <p>
+                So, the entire text after the [Event Id] is placed in the <strong>Message</strong> column on
+                LogParse.net, and the <strong>Scopes</strong> column is hidden.
+            </p>
+            <h2 id="nonStandard">Non-standard formats</h2>
+            <p>
+                If your logs are in a custom format, or you use a 3rd party logging solution like NLog, Serilog, or
+                log4net,
+                LogParse.net may not be able to parse them - it expects logs in the native .NET format.
+            </p>
+            <h2 id="contact">Contact</h2>
+            <p>
+                If you have any questions, bug reports, or ideas for improvement, please contact us at the email
+                below:
+            </p>
+            <p>
+                <a href="mailto:contact@logparse.net">contact@logparse.net</a>
+            </p>
+            <p>
+                We look forward to hearing from you, and will respond as soon as possible!
+            </p>
         </div>
     </div>
 
@@ -119,7 +429,7 @@
       There can be multiple lines if the entry contains line breaks.</code></pre>
                 <p>You can upload a log file, or the raw text can be copy/pasted in from the app debug window, the
                     Docker console, the server's stdout, etc., depending on where your code is running.</p>
-                <p>See the <a href="./about.html#logFormat" target="_blank">this</a> page for more details.</p>
+                <p>See the <a href="#logFormat" target="_blank">this</a> page for more details.</p>
             </div>
         </div>
     </div>

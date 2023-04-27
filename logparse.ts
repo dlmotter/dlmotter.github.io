@@ -303,7 +303,7 @@ function getLogEntries(input: string): Log[] {
             gridOptions['columnApi'].setColumnVisible('Scopes', scopesVisible);
             gridOptions['columnApi'].setColumnVisible('Timestamp', timestampVisible);
 
-            scrollToBottom();
+            scrollToGrid();
             return entries;
       } catch (error) {
             clearFile();
@@ -313,12 +313,10 @@ function getLogEntries(input: string): Log[] {
       }
 }
 
-function scrollToBottom() {
-      window.scroll({
-            top: document.body.scrollHeight,
-            left: 0,
-            behavior: 'smooth'
-      });
+function scrollToGrid() {
+      setTimeout(() => {
+            document.getElementById('grid').scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+      }, 0);
 }
 
 function autoSizeAll(skipHeader: boolean) {

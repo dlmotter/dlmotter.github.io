@@ -52,14 +52,13 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>
-                <span class="title">Log<span class="title-emph">Parse</span>.net</span>
-            </h1>
+            <span class="title">Log<span class="title-emph">Parse</span>.net</span>
             <div id="links">
                 <a id="aboutLink" href="./about.html" target="_blank">Help / About</a>
                 <a id="privacyLink" href="./privacy.html" target="_blank">Privacy Policy</a>
             </div>
             <div id="content">
+                <h1 class="header">Easily analyze your .NET logs</h1>
                 <p>
                     If you are a .NET developer looking for an easy way to analyze logs, you have come to the right
                     place.
@@ -72,13 +71,17 @@
                     We support logs written to the console or a file. As long as it is in the
                     standard .NET <a href="./about.html#logFormat" target="_blank">format</a>, we can parse it.
                 </p>
+                <h2>Tips and Tricks</h2>
                 <p>
                     Just copy and paste your logs from your console window or log file, or upload the entire file.
                     Any file extension is acceptable as long as it can be read as plain text and is in the proper format.
                 </p>
                 <p>
-                    If you have a lot of logs or are experiencing lag when copy and pasting, we recommend uploading the file
-                    as this will have better performance.
+                    If you have a lot of logs or are experiencing lag when copy and pasting, we recommend saving the text as a file and uploading it instead.
+                    This will have better performance because copy and pasting a large amount of text into a browser window can use a large amount of RAM which slows the browser down.
+                </p>
+                <p>
+                    Copy and pasting is best used when analyzing an app startup or an app that doesn't write many logs.
                 </p>
                 <p>
                     To get started, simply...
@@ -116,7 +119,7 @@
       There can be multiple lines if the entry contains line breaks.</code></pre>
                 <p>You can upload a log file, or the raw text can be copy/pasted in from the app debug window, the
                     Docker console, the server's stdout, etc., depending on where your code is running.</p>
-                <p>See the <a href="./about.html#logFormat" target="_blank">Help / About</a> page for more details.</p>
+                <p>See the <a href="./about.html#logFormat" target="_blank">this</a> page for more details.</p>
             </div>
         </div>
     </div>

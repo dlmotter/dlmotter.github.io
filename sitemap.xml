@@ -4,10 +4,6 @@
 		<loc>https://logparse.net/</loc>
         <priority>1.0</priority>
 	</url>
-	<!-- <url>
-		<loc>https://logparse.net/about.html</loc>
-        <priority>0.5</priority>
-	</url> -->
 	<url>
 		<loc>https://logparse.net/privacy.html</loc>
         <priority>0.5</priority>

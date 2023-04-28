@@ -272,6 +272,9 @@ function scrollToGrid() {
         document.getElementById('grid').scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
     }, 0);
 }
+function makeGridFullScreen() {
+    document.getElementById('grid').requestFullscreen();
+}
 function autoSizeAll(skipHeader) {
     const allColumnIds = [];
     gridOptions['columnApi'].getColumns().forEach((column) => {
@@ -582,6 +585,15 @@ document.addEventListener('DOMContentLoaded', () => {
     new window['agGrid'].Grid(gridDiv, gridOptions);
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         setDarkLight(true);
+    }
+});
+document.addEventListener("fullscreenchange", () => {
+    let fullScreenButton = document.getElementById('fullScreenButton');
+    if (document.fullscreenElement) {
+        fullScreenButton.style.visibility = "hidden";
+    }
+    else {
+        fullScreenButton.style.visibility = "visible";
     }
 });
 // Listen to dark mode/light mode changes

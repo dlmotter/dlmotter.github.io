@@ -97,8 +97,35 @@ a:visited {
     --ag-line-height: 1.5rem;
 }
 
+#grid:fullscreen {
+    padding: 0;
+}
+
 #logsGrid {
     height: 100%;
+    position: relative;
+}
+
+#fullScreenButton {
+    height: 3.5rem;
+    width: 3.5rem;
+    border-radius: 2rem;
+    background-color: #19647E;
+    fill: white;
+    opacity: .3;
+    transition: opacity .3s ease-in-out;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    right: 3rem;
+    bottom: 3rem;
+    z-index: 1;
+}
+
+#fullScreenButton:hover {
+    opacity: .8;
 }
 
 /* ===================== MODAL ===================== */

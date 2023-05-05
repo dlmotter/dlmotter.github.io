@@ -285,6 +285,57 @@ function getLogEntries(input: string): Log[] {
 
                                     currentEntry.MessageLines.push(parts[5]);
                               }
+                        } 
+                        else {
+                              try {
+                                    let entry = JSON.parse(line);
+                                    if (
+                                          entry["EventId"] !== undefined &&
+                                          entry["LogLevel"] !== undefined &&
+                                          entry["Category"] !== undefined &&
+                                          entry["Message"] !== undefined
+                                    ) {
+                                          if (hasEntry) {
+                                                currentEntry.Order = currentIndex++;
+                                                entries.push(currentEntry);
+                                          }
+
+                                          hasEntry = true;
+
+                                          currentEntry = new Log();
+                                          currentEntry.Timestamp = null;
+                                          currentEntry.Level = entry["LogLevel"];
+                                          currentEntry.Type = entry["Category"];
+                                          currentEntry.EventId = entry["EventId"];
+                                          currentEntry.MessageLines = [];
+                                          currentEntry.Scopes = [];
+
+                                          currentEntry.MessageLines.push(...entry["Message"].split('\r\n'));
+                                          
+                                          if (entry["Timestamp"] !== undefined){
+                                                let timestamp = getTimestamp(entry["Timestamp"]);
+                                                if (!!timestamp) {
+                                                      timestampVisible = true;
+                                                      currentEntry.Timestamp = timestamp;
+                                                }  
+                                          }
+
+                                          if (entry["Scopes"] !== undefined) {
+                                                entry["Scopes"].forEach(scopeEntry => {
+                                                      if (scopeEntry["Message"] !== undefined) {
+                                                            scopesVisible = true;
+                                                            currentEntry.Scopes.push(scopeEntry["Message"]);
+                                                      } else if (typeof scopeEntry === 'string') {
+                                                            scopesVisible = true;
+                                                            currentEntry.Scopes.push(scopeEntry);
+                                                      }
+                                                });
+                                          }
+                                    }
+                              }
+                              catch (e) {
+                                    // Wasn't JSON
+                              }
                         }
                   }
             }
